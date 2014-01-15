@@ -388,6 +388,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
 				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = (
 					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
 					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
@@ -531,6 +532,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
 				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = (
 					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
 					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
