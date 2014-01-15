@@ -1,4 +1,3 @@
-#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Object/ObjectFile.h"
 #include "llvm/Support/Format.h"
