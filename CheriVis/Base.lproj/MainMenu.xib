@@ -1011,7 +1011,7 @@
                 </constraints>
             </view>
         </window>
-        <customObject id="494" customClass="CVAppDelegate">
+        <customObject id="494">
             <connections>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
