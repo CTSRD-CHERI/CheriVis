@@ -6,7 +6,7 @@
 #import "CVColors.h"
 #import <Cocoa/Cocoa.h>
 
-@interface CheriVis : NSObject
+@interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
 @end
 
 
