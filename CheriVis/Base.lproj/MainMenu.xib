@@ -65,11 +65,6 @@
                 <menuItem title="File" id="83">
                     <menu key="submenu" title="File" id="81">
                         <items>
-                            <menuItem title="New" keyEquivalent="n" id="82">
-                                <connections>
-                                    <action selector="newDocument:" target="-1" id="373"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Open Trace…" keyEquivalent="o" id="72">
                                 <connections>
                                     <action selector="openTrace:" target="eyh-sd-u4H" id="Lsz-ji-Aas"/>
@@ -80,17 +75,6 @@
                                     <action selector="openProcstat:" target="eyh-sd-u4H" id="6sT-dA-YyO"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Open Recent" id="124">
-                                <menu key="submenu" title="Open Recent" systemMenu="recentDocuments" id="125">
-                                    <items>
-                                        <menuItem title="Clear Menu" id="126">
-                                            <connections>
-                                                <action selector="clearRecentDocuments:" target="-1" id="127"/>
-                                            </connections>
-                                        </menuItem>
-                                    </items>
-                                </menu>
-                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="79">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
@@ -98,9 +82,6 @@
                                 <connections>
                                     <action selector="performClose:" target="-1" id="193"/>
                                 </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="74">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
                         </items>
                     </menu>
@@ -630,7 +611,7 @@
             </items>
         </menu>
         <window title="CheriVis" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="371">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="675" height="432"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
@@ -730,6 +711,9 @@
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="changeDisplay:" target="eyh-sd-u4H" id="ejK-QA-Vuc"/>
+                        </connections>
                     </button>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="PpB-1a-Dmx">
                         <rect key="frame" x="533" y="360" width="124" height="18"/>
@@ -738,6 +722,9 @@
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="changeDisplay:" target="eyh-sd-u4H" id="xVq-lg-iFs"/>
+                        </connections>
                     </button>
                     <splitView dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WiW-Po-kf1">
                         <rect key="frame" x="-5" y="0.0" width="680" height="349"/>
@@ -748,14 +735,14 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <subviews>
                                     <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="S0B-TC-jpy">
-                                        <rect key="frame" x="0.0" y="0.0" width="410" height="120.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="410" height="121"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <clipView key="contentView" id="gzx-N6-4CT">
-                                            <rect key="frame" x="1" y="17" width="408" height="102.5"/>
+                                            <rect key="frame" x="1" y="17" width="408" height="103"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="JqR-jX-K2m" id="pGx-3V-TN3">
-                                                    <rect key="frame" x="0.0" y="0.0" width="408" height="102.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="408" height="103"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -823,11 +810,11 @@
                                         </tableHeaderView>
                                     </scrollView>
                                     <customView id="H0f-fX-m1P">
-                                        <rect key="frame" x="0.0" y="130.5" width="410" height="218.5"/>
+                                        <rect key="frame" x="0.0" y="131" width="410" height="218"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7uX-qr-hGE">
-                                                <rect key="frame" x="9" y="201.5" width="403" height="17"/>
+                                                <rect key="frame" x="9" y="201" width="403" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="alL-CY-GlI">
                                                     <font key="font" metaFont="system"/>
@@ -836,7 +823,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EFT-Mm-fxW">
-                                                <rect key="frame" x="9" y="181.5" width="403" height="17"/>
+                                                <rect key="frame" x="9" y="181" width="403" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="Nql-0k-BOR">
                                                     <font key="font" metaFont="system"/>
@@ -845,7 +832,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0qQ-68-mo9">
-                                                <rect key="frame" x="0.0" y="0.5" width="410" height="174"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="410" height="174"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <clipView key="contentView" misplaced="YES" id="Puu-qT-ytm">
                                                     <rect key="frame" x="1" y="17" width="408" height="156"/>
