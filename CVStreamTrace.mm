@@ -155,7 +155,7 @@ struct RegisterState
 	NSMutableArray *array = [NSMutableArray new];
 	for (size_t i=0 ; i<(sizeof(MipsRegisterNames) / sizeof(*MipsRegisterNames)) ; i++)
 	{
-		[array addObject: [NSString stringWithFormat: @"$%d %s", i, MipsRegisterNames[i]]];
+		[array addObject: [NSString stringWithFormat: @"$%d %s", (int)i, MipsRegisterNames[i]]];
 	}
 	return array;
 }
