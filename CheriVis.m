@@ -179,7 +179,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	// cheap and changes to user defaults are infrequent.
 	[[mainWindow contentView] setNeedsDisplay: YES];
 }
-- (void)searchWithIncrement: (NSUInteger)increment;
+- (void)searchWithIncrement: (NSUInteger)increment
 {
 	NSInteger end = [traceView selectedRow];
 	// If no row is selected, start from 0
