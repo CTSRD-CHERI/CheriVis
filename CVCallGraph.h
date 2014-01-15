@@ -1,4 +1,5 @@
 #import <Foundation/NSObject.h>
+#import <Foundation/NSIndexSet.h>
 
 @class CVStreamTrace;
 @class CVAddressMap;

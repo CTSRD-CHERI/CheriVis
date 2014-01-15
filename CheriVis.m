@@ -400,7 +400,8 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		{
 			NSColor *textColor = [streamTrace isKernel] ?
 				[CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
-			return stringWithColor([NSString stringWithFormat: @"0x%.16llx", [streamTrace programCounter]], textColor);
+			return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64,
+					[streamTrace programCounter]], textColor);
 		}
 		if ([@"instruction" isEqualToString: columnId])
 		{

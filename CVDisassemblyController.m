@@ -70,7 +70,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	NSString *columnId = [aTableColumn identifier];
 	if ([@"pc" isEqualToString: columnId])
 	{
-		return stringWithColor([NSString stringWithFormat: @"0x%.16llx",
+		return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64,
 				startAddress + (rowIndex * 4)], nil);
 	}
 	if ([@"instruction" isEqualToString: columnId])
