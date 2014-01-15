@@ -13,6 +13,7 @@
  */
 - (id)initWithStreamTrace: (CVStreamTrace*)aTrace
                addressMap: (CVAddressMap*)anAddressMap
+            indexesToShow: (NSIndexSet*)anIndexSet
       functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock;
 @end
 
