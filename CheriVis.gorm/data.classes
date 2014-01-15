@@ -1,0 +1,59 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    CVCallGraph = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSObject;
+    };
+    CVDisassemblyController = {
+	Actions = (
+	);
+	Outlets = (
+	    disassembly,
+	    nameField,
+	    demangledNameField
+	);
+	Super = NSObject;
+    };
+    CheriVis = {
+	Actions = (
+	    "openProcstat:",
+	    "openTrace:",
+	    "searchBack:",
+	    "newAction:",
+	    "search:",
+	    "changeDisplay:",
+	    "generateCallGraph:"
+	);
+	Outlets = (
+	    disassembly,
+	    traceView,
+	    regsView,
+	    regexSearch,
+	    searchAddresses,
+	    searchDisassembly,
+	    searchInstructions,
+	    searchRegisterValues,
+	    searchText,
+	    showKernel,
+	    showUserspace,
+	    callGraph,
+	    mainWindow
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "changeDisplay:",
+	    "generateCallGraph:",
+	    "newAction:",
+	    "openProcstat:",
+	    "openTrace:",
+	    "search:",
+	    "searchBack:"
+	);
+	Super = NSObject;
+    };
+}
