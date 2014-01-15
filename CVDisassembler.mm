@@ -11,7 +11,9 @@
 #include "llvm/MC/MCFunction.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
+#undef NO
 #include "llvm/MC/MCInstrAnalysis.h"
+#define NO (BOOL)0
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCModule.h"
 #include "llvm/MC/MCObjectDisassembler.h"
@@ -92,6 +94,7 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint64_t anInstructio
 	{
 		// FIXME: Works around a bug in LLVM.
 		if (inst.getOpcode() != 1051 &&
+            inst.getOpcode() != 1148 &&
 		    inst.getOpcode() != 1098)
 		{
 			std::string buffer;

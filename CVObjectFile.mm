@@ -11,6 +11,7 @@
 #include "llvm/MC/MCFunction.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
+#undef NO
 #include "llvm/MC/MCInstrAnalysis.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCModule.h"
@@ -24,6 +25,8 @@
 
 #import "CVObjectFile.h"
 #import <Foundation/Foundation.h>
+
+#define NO (BOOL)0
 
 #include <vector>
 #include <cxxabi.h>
