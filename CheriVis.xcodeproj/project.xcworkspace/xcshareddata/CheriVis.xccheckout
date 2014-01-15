@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>9CD3A279-FCE6-4F5A-ABAC-F9E7AD73C281</string>
+	<key>IDESourceControlProjectName</key>
+	<string>CheriVis</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>35FEAA44-3345-4107-A8A4-E4890DB6AABC</key>
+		<string>https://github.com/CTSRD-CHERI/CheriVis</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>CheriVis/CheriVis.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>35FEAA44-3345-4107-A8A4-E4890DB6AABC</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/CTSRD-CHERI/CheriVis</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>35FEAA44-3345-4107-A8A4-E4890DB6AABC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>35FEAA44-3345-4107-A8A4-E4890DB6AABC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>CheriVis</string>
+		</dict>
+	</array>
+</dict>
+</plist>

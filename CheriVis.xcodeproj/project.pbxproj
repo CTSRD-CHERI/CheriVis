@@ -1,0 +1,742 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		28459D20188620EC00798DAC /* CheriVis.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D11188620EC00798DAC /* CheriVis.m */; };
+		28459D21188620EC00798DAC /* CVAddressMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D13188620EC00798DAC /* CVAddressMap.m */; };
+		28459D22188620EC00798DAC /* CVCallGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D15188620EC00798DAC /* CVCallGraph.m */; };
+		28459D23188620EC00798DAC /* CVColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D17188620EC00798DAC /* CVColors.m */; };
+		28459D24188620EC00798DAC /* CVDisassembler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D19188620EC00798DAC /* CVDisassembler.mm */; };
+		28459D25188620EC00798DAC /* CVDisassemblyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1B188620EC00798DAC /* CVDisassemblyController.m */; };
+		28459D26188620EC00798DAC /* CVObjectFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1D188620EC00798DAC /* CVObjectFile.mm */; };
+		28459D27188620EC00798DAC /* CVStreamTrace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1F188620EC00798DAC /* CVStreamTrace.mm */; };
+		28459D291886225D00798DAC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D281886225D00798DAC /* main.m */; };
+		28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
+		28E5373118862022006FE3AE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28E5372F18862022006FE3AE /* InfoPlist.strings */; };
+		28E5373718862022006FE3AE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373518862022006FE3AE /* Credits.rtf */; };
+		28E5373D18862022006FE3AE /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373B18862022006FE3AE /* MainMenu.xib */; };
+		28E5373F18862022006FE3AE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373E18862022006FE3AE /* Images.xcassets */; };
+		28E5374718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		28E5374818862022006FE3AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28E5371B18862022006FE3AE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 28E5372218862022006FE3AE;
+			remoteInfo = CheriVis;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		28459D11188620EC00798DAC /* CheriVis.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheriVis.m; sourceTree = SOURCE_ROOT; };
+		28459D12188620EC00798DAC /* CVAddressMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVAddressMap.h; sourceTree = SOURCE_ROOT; };
+		28459D13188620EC00798DAC /* CVAddressMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVAddressMap.m; sourceTree = SOURCE_ROOT; };
+		28459D14188620EC00798DAC /* CVCallGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVCallGraph.h; sourceTree = SOURCE_ROOT; };
+		28459D15188620EC00798DAC /* CVCallGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVCallGraph.m; sourceTree = SOURCE_ROOT; };
+		28459D16188620EC00798DAC /* CVColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVColors.h; sourceTree = SOURCE_ROOT; };
+		28459D17188620EC00798DAC /* CVColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVColors.m; sourceTree = SOURCE_ROOT; };
+		28459D18188620EC00798DAC /* CVDisassembler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassembler.h; sourceTree = SOURCE_ROOT; };
+		28459D19188620EC00798DAC /* CVDisassembler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVDisassembler.mm; sourceTree = SOURCE_ROOT; };
+		28459D1A188620EC00798DAC /* CVDisassemblyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassemblyController.h; sourceTree = SOURCE_ROOT; };
+		28459D1B188620EC00798DAC /* CVDisassemblyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVDisassemblyController.m; sourceTree = SOURCE_ROOT; };
+		28459D1C188620EC00798DAC /* CVObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVObjectFile.h; sourceTree = SOURCE_ROOT; };
+		28459D1D188620EC00798DAC /* CVObjectFile.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVObjectFile.mm; sourceTree = SOURCE_ROOT; };
+		28459D1E188620EC00798DAC /* CVStreamTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVStreamTrace.h; sourceTree = SOURCE_ROOT; };
+		28459D1F188620EC00798DAC /* CVStreamTrace.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVStreamTrace.mm; sourceTree = SOURCE_ROOT; };
+		28459D281886225D00798DAC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		28E5372318862022006FE3AE /* CheriVis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheriVis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		28E5372618862022006FE3AE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		28E5372918862022006FE3AE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		28E5372B18862022006FE3AE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		28E5372E18862022006FE3AE /* CheriVis-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CheriVis-Info.plist"; sourceTree = "<group>"; };
+		28E5373018862022006FE3AE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		28E5373418862022006FE3AE /* CheriVis-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CheriVis-Prefix.pch"; sourceTree = "<group>"; };
+		28E5373618862022006FE3AE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		28E5373C18862022006FE3AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		28E5373E18862022006FE3AE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		28E5374418862022006FE3AE /* CheriVisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CheriVisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		28E5372018862022006FE3AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		28E5374118862022006FE3AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28E5374718862022006FE3AE /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		28E5371A18862022006FE3AE = {
+			isa = PBXGroup;
+			children = (
+				28E5372C18862022006FE3AE /* CheriVis */,
+				28E5372518862022006FE3AE /* Frameworks */,
+				28E5372418862022006FE3AE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		28E5372418862022006FE3AE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				28E5372318862022006FE3AE /* CheriVis.app */,
+				28E5374418862022006FE3AE /* CheriVisTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		28E5372518862022006FE3AE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				28E5372618862022006FE3AE /* Cocoa.framework */,
+				28E5372818862022006FE3AE /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		28E5372818862022006FE3AE /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				28E5372918862022006FE3AE /* AppKit.framework */,
+				28E5372B18862022006FE3AE /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		28E5372C18862022006FE3AE /* CheriVis */ = {
+			isa = PBXGroup;
+			children = (
+				28459D281886225D00798DAC /* main.m */,
+				28459D11188620EC00798DAC /* CheriVis.m */,
+				28459D12188620EC00798DAC /* CVAddressMap.h */,
+				28459D13188620EC00798DAC /* CVAddressMap.m */,
+				28459D14188620EC00798DAC /* CVCallGraph.h */,
+				28459D15188620EC00798DAC /* CVCallGraph.m */,
+				28459D16188620EC00798DAC /* CVColors.h */,
+				28459D17188620EC00798DAC /* CVColors.m */,
+				28459D18188620EC00798DAC /* CVDisassembler.h */,
+				28459D19188620EC00798DAC /* CVDisassembler.mm */,
+				28459D1A188620EC00798DAC /* CVDisassemblyController.h */,
+				28459D1B188620EC00798DAC /* CVDisassemblyController.m */,
+				28459D1C188620EC00798DAC /* CVObjectFile.h */,
+				28459D1D188620EC00798DAC /* CVObjectFile.mm */,
+				28459D1E188620EC00798DAC /* CVStreamTrace.h */,
+				28459D1F188620EC00798DAC /* CVStreamTrace.mm */,
+				28E5373B18862022006FE3AE /* MainMenu.xib */,
+				28E5373E18862022006FE3AE /* Images.xcassets */,
+				28E5372D18862022006FE3AE /* Supporting Files */,
+			);
+			path = CheriVis;
+			sourceTree = "<group>";
+		};
+		28E5372D18862022006FE3AE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				28E5372E18862022006FE3AE /* CheriVis-Info.plist */,
+				28E5372F18862022006FE3AE /* InfoPlist.strings */,
+				28E5373418862022006FE3AE /* CheriVis-Prefix.pch */,
+				28E5373518862022006FE3AE /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		28E5372218862022006FE3AE /* CheriVis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28E5375418862022006FE3AE /* Build configuration list for PBXNativeTarget "CheriVis" */;
+			buildPhases = (
+				28E5371F18862022006FE3AE /* Sources */,
+				28E5372018862022006FE3AE /* Frameworks */,
+				28E5372118862022006FE3AE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CheriVis;
+			productName = CheriVis;
+			productReference = 28E5372318862022006FE3AE /* CheriVis.app */;
+			productType = "com.apple.product-type.application";
+		};
+		28E5374318862022006FE3AE /* CheriVisTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28E5375718862022006FE3AE /* Build configuration list for PBXNativeTarget "CheriVisTests" */;
+			buildPhases = (
+				28E5374018862022006FE3AE /* Sources */,
+				28E5374118862022006FE3AE /* Frameworks */,
+				28E5374218862022006FE3AE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				28E5374918862022006FE3AE /* PBXTargetDependency */,
+			);
+			name = CheriVisTests;
+			productName = CheriVisTests;
+			productReference = 28E5374418862022006FE3AE /* CheriVisTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		28E5371B18862022006FE3AE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = CV;
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = "David Chisnall";
+				TargetAttributes = {
+					28E5374318862022006FE3AE = {
+						TestTargetID = 28E5372218862022006FE3AE;
+					};
+				};
+			};
+			buildConfigurationList = 28E5371E18862022006FE3AE /* Build configuration list for PBXProject "CheriVis" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 28E5371A18862022006FE3AE;
+			productRefGroup = 28E5372418862022006FE3AE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				28E5372218862022006FE3AE /* CheriVis */,
+				28E5374318862022006FE3AE /* CheriVisTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		28E5372118862022006FE3AE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28E5373118862022006FE3AE /* InfoPlist.strings in Resources */,
+				28E5373F18862022006FE3AE /* Images.xcassets in Resources */,
+				28E5373718862022006FE3AE /* Credits.rtf in Resources */,
+				28E5373D18862022006FE3AE /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		28E5374218862022006FE3AE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		28E5371F18862022006FE3AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28459D23188620EC00798DAC /* CVColors.m in Sources */,
+				28459D20188620EC00798DAC /* CheriVis.m in Sources */,
+				28459D21188620EC00798DAC /* CVAddressMap.m in Sources */,
+				28459D25188620EC00798DAC /* CVDisassemblyController.m in Sources */,
+				28459D24188620EC00798DAC /* CVDisassembler.mm in Sources */,
+				28459D22188620EC00798DAC /* CVCallGraph.m in Sources */,
+				28459D27188620EC00798DAC /* CVStreamTrace.mm in Sources */,
+				28459D291886225D00798DAC /* main.m in Sources */,
+				28459D26188620EC00798DAC /* CVObjectFile.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		28E5374018862022006FE3AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		28E5374918862022006FE3AE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 28E5372218862022006FE3AE /* CheriVis */;
+			targetProxy = 28E5374818862022006FE3AE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		28E5372F18862022006FE3AE /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28E5373018862022006FE3AE /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		28E5373518862022006FE3AE /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28E5373618862022006FE3AE /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		28E5373B18862022006FE3AE /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28E5373C18862022006FE3AE /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		28E5375218862022006FE3AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		28E5375318862022006FE3AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		28E5375518862022006FE3AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
+				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				OTHER_CFLAGS = (
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/theraven/Documents/Research/cheri/llvm/Build/lib",
+					"-lcurses",
+					"-lpthread",
+					"-lz\n-lLLVMMCDisassembler",
+					"-lLLVMDebugInfo",
+					"-lLLVMXCoreDisassembler",
+					"-lLLVMXCoreCodeGen",
+					"-lLLVMXCoreDesc",
+					"-lLLVMXCoreInfo",
+					"-lLLVMXCoreAsmPrinter",
+					"-lLLVMX86Disassembler",
+					"-lLLVMX86AsmParser",
+					"-lLLVMX86CodeGen",
+					"-lLLVMX86Desc",
+					"-lLLVMX86Info",
+					"-lLLVMX86AsmPrinter",
+					"-lLLVMX86Utils",
+					"-lLLVMSystemZDisassembler",
+					"-lLLVMSystemZCodeGen",
+					"-lLLVMSystemZAsmParser",
+					"-lLLVMSystemZDesc",
+					"-lLLVMSystemZInfo",
+					"-lLLVMSystemZAsmPrinter",
+					"-lLLVMSparcCodeGen",
+					"-lLLVMSparcDesc",
+					"-lLLVMSparcInfo",
+					"-lLLVMR600CodeGen",
+					"-lLLVMR600Desc",
+					"-lLLVMR600Info",
+					"-lLLVMR600AsmPrinter",
+					"-lLLVMPowerPCCodeGen",
+					"-lLLVMPowerPCAsmParser",
+					"-lLLVMPowerPCDesc",
+					"-lLLVMPowerPCInfo",
+					"-lLLVMPowerPCAsmPrinter",
+					"-lLLVMNVPTXCodeGen",
+					"-lLLVMNVPTXDesc",
+					"-lLLVMNVPTXInfo",
+					"-lLLVMNVPTXAsmPrinter",
+					"-lLLVMMSP430CodeGen",
+					"-lLLVMMSP430Desc",
+					"-lLLVMMSP430Info",
+					"-lLLVMMSP430AsmPrinter",
+					"-lLLVMMipsDisassembler",
+					"-lLLVMMipsCodeGen",
+					"-lLLVMMipsAsmParser",
+					"-lLLVMMipsDesc",
+					"-lLLVMMipsInfo",
+					"-lLLVMMipsAsmPrinter",
+					"-lLLVMHexagonCodeGen",
+					"-lLLVMHexagonAsmPrinter",
+					"-lLLVMHexagonDesc",
+					"-lLLVMHexagonInfo",
+					"-lLLVMCppBackendCodeGen",
+					"-lLLVMCppBackendInfo",
+					"-lLLVMARMDisassembler",
+					"-lLLVMARMCodeGen",
+					"-lLLVMARMAsmParser",
+					"-lLLVMARMDesc",
+					"-lLLVMARMInfo",
+					"-lLLVMARMAsmPrinter",
+					"-lLLVMAArch64Disassembler",
+					"-lLLVMAArch64CodeGen",
+					"-lLLVMSelectionDAG",
+					"-lLLVMAsmPrinter",
+					"-lLLVMCodeGen",
+					"-lLLVMObjCARCOpts",
+					"-lLLVMScalarOpts",
+					"-lLLVMInstCombine",
+					"-lLLVMTransformUtils",
+					"-lLLVMipa",
+					"-lLLVMAnalysis",
+					"-lLLVMAArch64AsmParser",
+					"-lLLVMMCParser",
+					"-lLLVMAArch64Desc",
+					"-lLLVMAArch64Info",
+					"-lLLVMTarget",
+					"-lLLVMAArch64AsmPrinter",
+					"-lLLVMMC",
+					"-lLLVMObject",
+					"-lLLVMAArch64Utils",
+					"-lLLVMCore",
+					"-lLLVMSupport\n",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		28E5375618862022006FE3AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
+				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				OTHER_CFLAGS = (
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Build/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/theraven/Documents/Research/cheri/llvm/Build/lib",
+					"-lcurses",
+					"-lpthread",
+					"-lz\n-lLLVMMCDisassembler",
+					"-lLLVMDebugInfo",
+					"-lLLVMXCoreDisassembler",
+					"-lLLVMXCoreCodeGen",
+					"-lLLVMXCoreDesc",
+					"-lLLVMXCoreInfo",
+					"-lLLVMXCoreAsmPrinter",
+					"-lLLVMX86Disassembler",
+					"-lLLVMX86AsmParser",
+					"-lLLVMX86CodeGen",
+					"-lLLVMX86Desc",
+					"-lLLVMX86Info",
+					"-lLLVMX86AsmPrinter",
+					"-lLLVMX86Utils",
+					"-lLLVMSystemZDisassembler",
+					"-lLLVMSystemZCodeGen",
+					"-lLLVMSystemZAsmParser",
+					"-lLLVMSystemZDesc",
+					"-lLLVMSystemZInfo",
+					"-lLLVMSystemZAsmPrinter",
+					"-lLLVMSparcCodeGen",
+					"-lLLVMSparcDesc",
+					"-lLLVMSparcInfo",
+					"-lLLVMR600CodeGen",
+					"-lLLVMR600Desc",
+					"-lLLVMR600Info",
+					"-lLLVMR600AsmPrinter",
+					"-lLLVMPowerPCCodeGen",
+					"-lLLVMPowerPCAsmParser",
+					"-lLLVMPowerPCDesc",
+					"-lLLVMPowerPCInfo",
+					"-lLLVMPowerPCAsmPrinter",
+					"-lLLVMNVPTXCodeGen",
+					"-lLLVMNVPTXDesc",
+					"-lLLVMNVPTXInfo",
+					"-lLLVMNVPTXAsmPrinter",
+					"-lLLVMMSP430CodeGen",
+					"-lLLVMMSP430Desc",
+					"-lLLVMMSP430Info",
+					"-lLLVMMSP430AsmPrinter",
+					"-lLLVMMipsDisassembler",
+					"-lLLVMMipsCodeGen",
+					"-lLLVMMipsAsmParser",
+					"-lLLVMMipsDesc",
+					"-lLLVMMipsInfo",
+					"-lLLVMMipsAsmPrinter",
+					"-lLLVMHexagonCodeGen",
+					"-lLLVMHexagonAsmPrinter",
+					"-lLLVMHexagonDesc",
+					"-lLLVMHexagonInfo",
+					"-lLLVMCppBackendCodeGen",
+					"-lLLVMCppBackendInfo",
+					"-lLLVMARMDisassembler",
+					"-lLLVMARMCodeGen",
+					"-lLLVMARMAsmParser",
+					"-lLLVMARMDesc",
+					"-lLLVMARMInfo",
+					"-lLLVMARMAsmPrinter",
+					"-lLLVMAArch64Disassembler",
+					"-lLLVMAArch64CodeGen",
+					"-lLLVMSelectionDAG",
+					"-lLLVMAsmPrinter",
+					"-lLLVMCodeGen",
+					"-lLLVMObjCARCOpts",
+					"-lLLVMScalarOpts",
+					"-lLLVMInstCombine",
+					"-lLLVMTransformUtils",
+					"-lLLVMipa",
+					"-lLLVMAnalysis",
+					"-lLLVMAArch64AsmParser",
+					"-lLLVMMCParser",
+					"-lLLVMAArch64Desc",
+					"-lLLVMAArch64Info",
+					"-lLLVMTarget",
+					"-lLLVMAArch64AsmPrinter",
+					"-lLLVMMC",
+					"-lLLVMObject",
+					"-lLLVMAArch64Utils",
+					"-lLLVMCore",
+					"-lLLVMSupport\n",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		28E5375818862022006FE3AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CheriVis.app/Contents/MacOS/CheriVis";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "CheriVisTests/CheriVisTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		28E5375918862022006FE3AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/CheriVis.app/Contents/MacOS/CheriVis";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CheriVis/CheriVis-Prefix.pch";
+				INFOPLIST_FILE = "CheriVisTests/CheriVisTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		28E5371E18862022006FE3AE /* Build configuration list for PBXProject "CheriVis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28E5375218862022006FE3AE /* Debug */,
+				28E5375318862022006FE3AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		28E5375418862022006FE3AE /* Build configuration list for PBXNativeTarget "CheriVis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28E5375518862022006FE3AE /* Debug */,
+				28E5375618862022006FE3AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		28E5375718862022006FE3AE /* Build configuration list for PBXNativeTarget "CheriVisTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28E5375818862022006FE3AE /* Debug */,
+				28E5375918862022006FE3AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 28E5371B18862022006FE3AE /* Project object */;
+}
