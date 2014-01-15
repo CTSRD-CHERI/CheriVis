@@ -437,7 +437,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	}
 	return nil;
 }
-- (CVFunction*)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs;
+- (CVFunction*)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
 {
 	uint64_t pc = *aPc;
 	CVAddressRange range = [addressMap mappingForAddress: pc];

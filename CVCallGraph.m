@@ -117,7 +117,7 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 	}
 	return self;
 }
-- (void)dumpWithTabs: (NSInteger)tabIndex;
+- (void)dumpWithTabs: (NSInteger)tabIndex
 {
 	for (NSInteger i=0 ; i<tabIndex ; i++)
 	{
@@ -154,7 +154,7 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 - (id)initWithStreamTrace: (CVStreamTrace*)aTrace
                addressMap: (CVAddressMap*)anAddressMap
             indexesToShow: (NSIndexSet*)anIndexSet
-      functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock;
+      functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock
 {
 	if (nil == (self = [super init])) { return nil; }
 	NSInteger end = [anIndexSet lastIndex];
