@@ -195,18 +195,21 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 
 	std::string Error;
 	target = TargetRegistry::lookupTarget(cheriTriple, Error);
+	const MCRegisterInfo *MRI = target->createMCRegInfo(cheriTriple);
 	// First try to set up the target for CHERI, if it doesn't work then fall back to MIPS
-	if (target == 0)
+	if (MRI == 0)
 	{
 		target = TargetRegistry::lookupTarget(mipsTriple, Error);
+		MRI = target->createMCRegInfo(mipsTriple);
 		triple = mipsTriple;
 	}
-	if (target == 0)
+	if (MRI == 0)
 	{
 		[NSException raise: NSInternalInconsistencyException
 					format: @"Failed to initialise target: %s\n", Error.c_str()];
 	}
-	mri.reset(target->createMCRegInfo(triple));
+	NSLog(@"Using triple %s", triple.c_str());
+	mri.reset(MRI);
 	NSAssert(mri.isValid(), @"Failed to create MCRegisterInfo");
 	asmInfo.reset(target->createMCAsmInfo(*mri, triple));
 	NSAssert(asmInfo.isValid(), @"Failed to create MCAsmInfo");
