@@ -213,17 +213,6 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	disassembler = [CVDisassembler new];
 	length = [trace length] / 32;
 	registerKeyframes[0] = currentState;
-	cache = [[CVStreamTraceCache alloc] initWithInitialValue: currentState
-	                                               traceData: aTrace
-	                                              startIndex: 0
-	                                            disassembler: disassembler];
-	if (cache.length == CacheSize)
-	{
-		registerKeyframes[1] = [cache registerStateAtIndex: CacheSize-1];
-	}
-
-	kernelRanges = [NSMutableIndexSet new];
-	userspaceRanges = [NSMutableIndexSet new];
 
 	// In the background, load all of the information that we need to be able to handle the stream trace
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
@@ -270,6 +259,15 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 			}
 			[[self inMainThread] notifyLoaded: i finished: YES];
 		});
+
+	cache = [[CVStreamTraceCache alloc] initWithInitialValue: currentState
+	                                               traceData: aTrace
+	                                              startIndex: 0
+	                                            disassembler: disassembler];
+	kernelRanges = [NSMutableIndexSet new];
+	userspaceRanges = [NSMutableIndexSet new];
+
+
 	return self;
 }
 - (NSInteger)numberOfKernelTraceEntries
