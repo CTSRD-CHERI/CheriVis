@@ -3,3 +3,5 @@
 *xcuserdata*
 obj/*
 CheriVis.app
+*.core
+vgcore.*
