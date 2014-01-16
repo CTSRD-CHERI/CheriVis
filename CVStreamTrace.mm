@@ -1,6 +1,10 @@
+#include <algorithm>
+#include <map>
 #import <Foundation/Foundation.h>
-#import "CVStreamTrace.h"
+#import <dispatch/dispatch.h>
 
+#import "CVStreamTrace.h"
+#include <assert.h>
 
 //FIXME: Include cheri_debug.h from cherilibs
 struct cheri_debug_trace_entry_disk {
@@ -31,15 +35,172 @@ struct RegisterState
 	uint32_t validRegisters;
 	uint64_t registers[32];
 	// TODO: Capability registers
+	// TODO: FPU registers
 };
+static const long long CacheSize = 32768;
+
+@interface CVStreamTraceCache : NSObject
+@property NSInteger length;
+@property NSInteger start;
+@end
+
+static NSUInteger indexAtIndex(NSIndexSet *anIndexSet, NSUInteger anIndex)
+{
+	if (anIndex >= [anIndexSet count])
+	{
+		return 0;
+	}
+	NSUInteger max = [anIndexSet lastIndex];
+	NSUInteger min = 0;
+	NSRange searchRange = {0, anIndex};
+	NSUInteger idx = [anIndexSet countOfIndexesInRange: searchRange];
+	while (anIndex != idx)
+	{
+		if (idx < anIndex)
+		{
+			min = searchRange.length;
+			if (max - searchRange.length == 1)
+			{
+				searchRange.length++;
+			}
+			else
+			{
+				searchRange.length += (max - searchRange.length) / 2;
+			}
+		}
+		else
+		{
+			max = searchRange.length;
+			searchRange.length -= (searchRange.length - min) / 2;
+		}
+		idx = [anIndexSet countOfIndexesInRange: searchRange];
+	}
+	searchRange.length = [anIndexSet indexGreaterThanIndex: searchRange.length];
+	return searchRange.length;
+}
+static BOOL isKernelAddress(uint64_t anAddress)
+{
+	return  anAddress > 0xFFFFFFFF0000000;
+}
+
+@implementation CVStreamTraceCache
+{
+    struct RegisterState registers[CacheSize];
+}
+@synthesize start, length;
+
+- (id)initWithInitialValue: (struct RegisterState)initialRegisterSet
+                 traceData: (NSData*)aTrace
+                startIndex: (NSInteger)anIndex
+              disassembler: (CVDisassembler*)aDisassembler
+{
+	self = [super init];
+	length = std::min((long long)[aTrace length] / 32, CacheSize);
+	start = anIndex;
+	struct RegisterState *ors = &initialRegisterSet;
+
+	for (NSInteger i=anIndex ; i<(anIndex+length) ; i++)
+	{
+		struct cheri_debug_trace_entry_disk traceEntry;
+		[aTrace getBytes: &traceEntry
+		           range: NSMakeRange(i*32, 32)];
+
+		struct RegisterState *rs = &registers[i-start];
+		*rs = *ors;
+		rs->pc = NSSwapBigLongLongToHost(traceEntry.pc);
+		rs->cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
+		rs->exception = traceEntry.exception;
+		rs->instr = traceEntry.inst;
+		if (traceEntry.version == 1 || traceEntry.version == 2)
+		{
+			int regNo = [aDisassembler destinationRegisterForInstruction: rs->instr];
+			if (regNo >= 0)
+			{
+				rs->validRegisters |= (1<<regNo);
+				rs->registers[regNo] = NSSwapBigLongLongToHost(traceEntry.val2);
+			}
+		}
+		ors = rs;
+	}
+	return self;
+}
+- (struct RegisterState)registerStateAtIndex: (NSInteger)anIndex
+{
+	assert(anIndex >= start);
+	assert(anIndex < (start + length));
+	return registers[anIndex - start];
+}
+@end
+
+NSString *CVStreamTraceLoadedEntriesNotification = @"CVStreamTraceLoadedEntriesNotification";
+NSString *kCVStreamTraceLoadedEntriesCount = @"kCVStreamTraceLoadedEntriesCount";
+NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
+
+@interface CVInMainThreadProxy : NSProxy
+{
+@public
+	id receiver;
+}
+@end
+@implementation CVInMainThreadProxy
+- (NSMethodSignature*)methodSignatureForSelector:(SEL)aSel
+{
+	return [receiver methodSignatureForSelector: aSel];
+}
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+	[anInvocation performSelectorOnMainThread: @selector(invokeWithTarget:)
+	                               withObject: receiver
+	                            waitUntilDone: NO];
+}
+@end
+@implementation NSObject (InMainThread)
+- (id)inMainThread
+{
+	CVInMainThreadProxy	*p = [CVInMainThreadProxy alloc];
+	p->receiver = self;
+	return p;
+}
+@end
 
 @implementation CVStreamTrace
 {
-	OwningArrayPtr<struct RegisterState> registers;
+	std::map<NSInteger,struct RegisterState> registerKeyframes;
+	struct RegisterState currentState;
+	CVStreamTraceCache *cache;
 	NSInteger length;
 	NSData *trace;
-	NSInteger idx;
 	CVDisassembler *disassembler;
+	NSMutableIndexSet *kernelRanges;
+	NSMutableIndexSet *userspaceRanges;
+}
+- (void) notifyLoaded: (NSInteger)lastIndex finished: (BOOL)isDone
+{
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+	      [NSNumber numberWithInteger: lastIndex], kCVStreamTraceLoadedEntriesCount,
+	      [NSNumber numberWithBool: isDone], kCVStreamTraceLoadedAllEntries,
+	      nil];
+	[[NSNotificationCenter defaultCenter]
+	    postNotificationName: CVStreamTraceLoadedEntriesNotification
+	                  object: self
+	                userInfo: userInfo];
+}
+
+- (void)addKeyFrame: (struct RegisterState)aKeyframe atIndex: (NSInteger)anIndex
+{
+	registerKeyframes[anIndex] = aKeyframe;
+	[self notifyLoaded:anIndex * CacheSize finished:NO];
+}
+- (void)addRange: (NSRange)aRange isKernel: (BOOL)isKernel
+{
+	if (isKernel)
+	{
+		[kernelRanges addIndexesInRange: aRange];
+	}
+	else
+	{
+		[userspaceRanges addIndexesInRange: aRange];
+	}
 }
 - (id)initWithTraceData: (NSData*)aTrace
 {
@@ -47,61 +208,126 @@ struct RegisterState
 	trace = aTrace;
 	disassembler = [CVDisassembler new];
 	length = [trace length] / 32;
-	registers.reset(new struct RegisterState[length]);
-
-	for (NSInteger i=0 ; i<length ; i++)
+	registerKeyframes[0] = currentState;
+	cache = [[CVStreamTraceCache alloc] initWithInitialValue: currentState
+	                                               traceData: aTrace
+	                                              startIndex: 0
+	                                            disassembler: disassembler];
+	if (cache.length == CacheSize)
 	{
-		struct cheri_debug_trace_entry_disk traceEntry;
-		[trace getBytes: &traceEntry
-		          range: NSMakeRange(i*32, 32)];
-
-		struct RegisterState &rs = registers[i];
-		if (i > 1)
-		{
-			struct RegisterState &ors = registers[i-1];
-			rs.validRegisters = ors.validRegisters;
-			memcpy((void*)rs.registers, ors.registers, sizeof(rs.registers));
-		}
-		rs.pc = NSSwapBigLongLongToHost(traceEntry.pc);
-		if ((i % 1000) == 0)
-		rs.cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
-		rs.exception = traceEntry.exception;
-		rs.instr = traceEntry.inst;
-		if (traceEntry.version == 1 || traceEntry.version == 2)
-		{
-			int regNo = [disassembler destinationRegisterForInstruction: rs.instr];
-			if (regNo >= 0)
-			{
-				rs.validRegisters |= (1<<regNo);
-				rs.registers[regNo] = NSSwapBigLongLongToHost(traceEntry.val2);
-			}
-		}
+		registerKeyframes[1] = [cache registerStateAtIndex: CacheSize-1];
 	}
+
+	kernelRanges = [NSMutableIndexSet new];
+	userspaceRanges = [NSMutableIndexSet new];
+
+	// In the background, load all of the information that we need to be able to handle the stream trace
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+		^(void) {
+			CVDisassembler *dis = [CVDisassembler new];
+			struct RegisterState rs = {0,0,0,CVInstructionTypeUnknown,0,0,{0}};
+			BOOL lastWasKernel = NO;
+			NSRange currentRange = {0,0};
+			NSUInteger i;
+			CVStreamTrace *mainThreadSelf = [self inMainThread];
+			for (i=0 ; i<([trace length] / 32) ; i++)
+			{
+				struct cheri_debug_trace_entry_disk traceEntry;
+				[aTrace getBytes: &traceEntry
+				           range: NSMakeRange(i*32, 32)];
+				rs.pc = NSSwapBigLongLongToHost(traceEntry.pc);
+				rs.cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
+				rs.exception = traceEntry.exception;
+				rs.instr = traceEntry.inst;
+				if (isKernelAddress(rs.pc) != lastWasKernel)
+				{
+					[mainThreadSelf addRange: currentRange isKernel: lastWasKernel];
+					currentRange.location = i;
+					currentRange.length = 1;
+					lastWasKernel = !lastWasKernel;
+				}
+				else
+				{
+					currentRange.length++;
+				}
+				if (traceEntry.version == 1 || traceEntry.version == 2)
+				{
+					int regNo = [dis destinationRegisterForInstruction: rs.instr];
+					if (regNo >= 0)
+					{
+						rs.validRegisters |= (1<<regNo);
+						rs.registers[regNo] = NSSwapBigLongLongToHost(traceEntry.val2);
+					}
+				}
+				if ((i+1) % CacheSize == 0)
+				{
+					[mainThreadSelf addKeyFrame: rs atIndex: i/CacheSize];
+				}
+			}
+			[[self inMainThread] notifyLoaded: i finished: YES];
+		});
 	return self;
 }
+- (NSInteger)numberOfKernelTraceEntries
+{
+	return [kernelRanges count];
+}
+- (NSInteger)numberOfUserspaceTraceEntries
+{
+	return [userspaceRanges count];
+}
+- (NSInteger)kernelTraceEntryAtIndex: (NSInteger)anIndex
+{
+	return indexAtIndex(kernelRanges, anIndex);
+}
+- (NSInteger)userspaceTraceEntryAtIndex: (NSInteger)anIndex
+{
+	return indexAtIndex(userspaceRanges, anIndex);
+}
+
 - (BOOL)setStateToIndex: (NSInteger)anIndex
 {
 	if (anIndex < 0 || anIndex >= length)
 	{
 		return NO;
 	}
-	idx = anIndex;
+	// See if we can satisfy this from the cache
+	NSInteger cacheStart = cache.start;
+	if (cacheStart <= anIndex && (cacheStart + cache.length) > anIndex)
+	{
+		currentState = [cache registerStateAtIndex: anIndex];
+		return YES;
+	}
+	// We can't, so let's find the relevant part of the cache
+	NSInteger keyFrameIndex = anIndex / CacheSize;
+	auto keyFrame = registerKeyframes.find(keyFrameIndex-1);
+	struct RegisterState ors = {0,0,0,CVInstructionTypeUnknown,0,0,{0}};
+
+	if (keyFrame != registerKeyframes.end())
+	{
+		ors = (*keyFrame).second;
+	}
+	cache = [[CVStreamTraceCache alloc] initWithInitialValue: ors
+	                                               traceData: trace
+	                                              startIndex: keyFrameIndex * CacheSize
+	                                            disassembler: disassembler];
+	currentState = [cache registerStateAtIndex: anIndex];
 	return YES;
 }
 - (NSString*)instruction
 {
-	return [disassembler disassembleInstruction: registers[idx].instr];
+	return [disassembler disassembleInstruction: currentState.instr];
 }
 - (uint32_t)encodedInstruction
 {
-	return registers[idx].instr;
+	return currentState.instr;
 }
 - (NSArray*)integerRegisters
 {
 	NSMutableArray *array = [NSMutableArray new];
 	[array addObject: [NSNumber numberWithInt: 0]];
-	uint32_t mask = registers[idx].validRegisters;
-	uint64_t *regs = registers[idx].registers;
+	uint32_t mask = currentState.validRegisters;
+	uint64_t *regs = currentState.registers;
 	for (int i=1 ; i<32 ; i++)
 	{
 		if ((mask & (1<<i)) == 0)
@@ -117,7 +343,7 @@ struct RegisterState
 }
 - (uint64_t)programCounter
 {
-	return registers[idx].pc;
+	return currentState.pc;
 }
 - (NSInteger)numberOfTraceEntries
 {
@@ -134,15 +360,15 @@ struct RegisterState
 }
 - (CVInstructionType)instructionType
 {
-	return [disassembler typeOfInstruction: registers[idx].instr];
+	return [disassembler typeOfInstruction: currentState.instr];
 }
 - (uint8_t)exception
 {
-	return registers[idx].exception;
+	return currentState.exception;
 }
 - (BOOL)isKernel
 {
-	return registers[idx].pc > 0xFFFFFFFF0000000;
+	return isKernelAddress(currentState.pc);
 }
 @end
 

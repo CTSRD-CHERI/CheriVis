@@ -128,18 +128,6 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	 */
 	CVStreamTrace *streamTrace;
 	/**
-	 * A dictionary mapping from row indexes to stream trace entries
-	 * corresponding to kernel addresses.  This is used when hiding userspace
-	 * addresses, to quickly find the correct stream trace entry to show.
-	 */
-	NSMutableDictionary *kernelAddresses;
-	/**
-	 * A dictionary mapping from row indexes to stream trace entries
-	 * corresponding to userspace addresses.  This is used when hiding kernel
-	 * addresses, to quickly find the correct stream trace entry to show.
-	 */
-	NSMutableDictionary *userAddresses;
-	/**
 	 * The address map, containing the parsed procstat information, which maps
 	 * from address ranges to files.
 	 */
@@ -157,6 +145,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	 * Dictionary of all of the object files that we've loaded.
 	 */
 	NSMutableDictionary *objectFiles;
+	/**
+	 * Messages that will be put in the title bar.
+	 */
+	NSMutableDictionary *messages;
+	/**
+	 * The number of entries that were loaded last time we did a redisplay
+	 */
+	NSUInteger lastLoaded;
 }
 - (void)awakeFromNib
 {
@@ -164,13 +160,38 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	[regsView setDelegate: self];
 	[regsView setDataSource: self];
 
+	messages = [NSMutableDictionary new];
+
 	objectFiles = [NSMutableDictionary new];
 
 	[[NSNotificationCenter defaultCenter]
-		addObserver: self
-		   selector: @selector(defaultsDidChange:)
-			   name: NSUserDefaultsDidChangeNotification
-			 object: nil];
+	    addObserver: self
+	       selector: @selector(defaultsDidChange:)
+	           name: NSUserDefaultsDidChangeNotification
+	         object: nil];
+	[[NSNotificationCenter defaultCenter]
+ 	    addObserver: self
+	       selector: @selector(loadedEntries:)
+	           name: CVStreamTraceLoadedEntriesNotification
+	         object: nil];
+
+}
+- (void)setMessage: (NSString*)aString forKey: (id)aKey
+{
+	if (aString == nil)
+	{
+		[messages removeObjectForKey: aKey];
+	}
+	else
+	{
+		[messages setObject: aString forKey: aKey];
+	}
+	NSMutableString *title = [@"CheriVis" mutableCopy];
+	for (NSString *message in [messages objectEnumerator])
+	{
+		[title appendFormat: @" – %@", message];
+	}
+	[mainWindow setTitle: title];
 }
 - (void)defaultsDidChange: (NSNotification*)aNotification
 {
@@ -178,6 +199,20 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	// but the easiest thing to do is just redraw everything, since redraws are
 	// cheap and changes to user defaults are infrequent.
 	[[mainWindow contentView] setNeedsDisplay: YES];
+}
+- (void)loadedEntries: (NSNotification*)aNotification
+{
+	NSDictionary *userInfo = [aNotification userInfo];
+	NSNumber *loadedEntries = [userInfo objectForKey: kCVStreamTraceLoadedEntriesCount];
+	NSNumber *loadedAllEntries = [userInfo objectForKey: kCVStreamTraceLoadedAllEntries];
+	NSUInteger loaded = [loadedEntries unsignedIntegerValue];
+	[self setMessage: [NSString stringWithFormat: @"Loaded %@ entries", loadedEntries]
+	          forKey: @"loadedCount"];
+	if ((loaded - lastLoaded > 100000) || [loadedAllEntries boolValue])
+	{
+		[traceView reloadData];
+	}
+	lastLoaded = loaded;
 }
 - (void)searchWithIncrement: (NSUInteger)increment
 {
@@ -311,25 +346,8 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	NSString *file = openFile(@"Open Stream Trace");
 	if (file != nil)
 	{
-		NSData *traceData = [NSData dataWithContentsOfFile: file];
+		NSData *traceData = [NSData dataWithContentsOfMappedFile: file];
 		streamTrace = [[CVStreamTrace alloc] initWithTraceData: traceData];
-		kernelAddresses = [NSMutableDictionary new];
-		userAddresses = [NSMutableDictionary new];
-		for (NSInteger i=0, e=[streamTrace numberOfTraceEntries],
-		     kernIdx=0, userIdx=0 ; i<e ; i++)
-		{
-			[streamTrace setStateToIndex: i];
-			if ([streamTrace isKernel])
-			{
-				[kernelAddresses setObject: [NSNumber numberWithInteger: i]
-				                    forKey: [NSNumber numberWithInteger: kernIdx++]];
-			}
-			else
-			{
-				[userAddresses setObject: [NSNumber numberWithInteger: i]
-				                  forKey: [NSNumber numberWithInteger: userIdx++]];
-			}
-		}
 		[traceView reloadData];
 		integerRegisterNames = [streamTrace integerRegisterNames];
 	}
@@ -367,11 +385,11 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		}
 		if (showKern)
 		{
-			return [kernelAddresses count];
+			return [streamTrace numberOfKernelTraceEntries];
 		}
 		if (showUser)
 		{
-			return [userAddresses count];
+			return [streamTrace numberOfUserspaceTraceEntries];
 		}
 		return 0;
 	}
@@ -389,11 +407,11 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		BOOL showUser = [showUserspace state] == NSOnState;
 		if (showKern && !showUser)
 		{
-			rowIndex = [[kernelAddresses objectForKey: [NSNumber numberWithInteger: rowIndex]] integerValue];
+			rowIndex = [streamTrace kernelTraceEntryAtIndex: rowIndex];
 		}
 		else if (showUser && !showKern)
 		{
-			rowIndex = [[userAddresses objectForKey: [NSNumber numberWithInteger: rowIndex]] integerValue];
+			rowIndex = [streamTrace userspaceTraceEntryAtIndex: rowIndex];
 		}
 		[streamTrace setStateToIndex: rowIndex];
 		if ([@"pc" isEqualToString: columnId])
@@ -493,11 +511,11 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		BOOL showUser = [showUserspace state] == NSOnState;
 		if (showKern && !showUser)
 		{
-			selectedRow = [[kernelAddresses objectForKey: [NSNumber numberWithInteger: selectedRow]] integerValue];
+			selectedRow = [streamTrace kernelTraceEntryAtIndex: selectedRow];
 		}
 		else if (showUser && !showKern)
 		{
-			selectedRow = [[userAddresses objectForKey: [NSNumber numberWithInteger: selectedRow]] integerValue];
+			selectedRow = [streamTrace userspaceTraceEntryAtIndex: selectedRow];
 		}
 		[streamTrace setStateToIndex: selectedRow];
 		integerRegisterValues = [streamTrace integerRegisters];

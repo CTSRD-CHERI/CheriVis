@@ -24,6 +24,26 @@
  */
 - (NSInteger)numberOfTraceEntries;
 /**
+ * Returns the number of trace entries where the program counter is in the
+ * kernel address range.
+ */
+- (NSInteger)numberOfKernelTraceEntries;
+/**
+ * Returns the number of trace entries where the program counter is in the
+ * userspace address range.
+ */
+- (NSInteger)numberOfUserspaceTraceEntries;
+/**
+ * Returns the index in the trace that corresponds to the index within just the
+ * kernelspace instructions.
+ */
+- (NSInteger)kernelTraceEntryAtIndex: (NSInteger)anIndex;
+/**
+ * Returns the index in the trace that corresponds to the index within just the
+ * userspace instructions.
+ */
+- (NSInteger)userspaceTraceEntryAtIndex: (NSInteger)anIndex;
+/**
  * Returns the (decoded) instruction for the current index in the stream.
  */
 - (NSString*)instruction;
@@ -63,3 +83,7 @@
  */
 - (BOOL)isKernel;
 @end
+
+extern NSString *CVStreamTraceLoadedEntriesNotification;
+extern NSString *kCVStreamTraceLoadedEntriesCount;
+extern NSString *kCVStreamTraceLoadedAllEntries;
