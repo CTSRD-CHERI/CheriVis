@@ -92,7 +92,7 @@
 			return *ar;
 		}
 	}
-	return (CVAddressRange){0};
+	return (CVAddressRange){0,0,0,0,0,0};
 }
 - (void)dealloc
 {
