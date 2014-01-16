@@ -1,32 +1,5 @@
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/TargetRegistry.h"
-#include "llvm/Object/ObjectFile.h"
-#include "llvm/Support/Format.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Support/StringRefMemoryObject.h"
-#include "llvm/MC/MCAsmInfo.h"
-#include "llvm/MC/MCAtom.h"
-#include "llvm/MC/MCContext.h"
-#include "llvm/MC/MCDisassembler.h"
-#include "llvm/MC/MCFunction.h"
-#include "llvm/MC/MCInst.h"
-#include "llvm/MC/MCInstPrinter.h"
-#undef NO
-#include "llvm/MC/MCInstrAnalysis.h"
-#define NO (BOOL)0
-#include "llvm/MC/MCInstrInfo.h"
-#include "llvm/MC/MCModule.h"
-#include "llvm/MC/MCObjectDisassembler.h"
-#include "llvm/MC/MCObjectFileInfo.h"
-#include "llvm/MC/MCObjectSymbolizer.h"
-#include "llvm/MC/MCRegisterInfo.h"
-#include "llvm/MC/MCRelocationInfo.h"
-#include "llvm/MC/MCSubtargetInfo.h"
-
 #import <Foundation/Foundation.h>
 #import "CVStreamTrace.h"
-
-using namespace llvm;
 
 
 //FIXME: Include cheri_debug.h from cherilibs
