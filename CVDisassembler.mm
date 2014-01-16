@@ -54,13 +54,13 @@ static int registerIndexForString(const char *str)
 	long idx = strtol(str, &end, 10);
 	if (str != end)
 	{
-		return idx;
+		return (int)idx;
 	}
 	for (size_t i=0 ; i<(sizeof(MipsRegisterNames) / sizeof(*MipsRegisterNames)) ; i++)
 	{
 		if (strcmp(str, MipsRegisterNames[i]) == 0)
 		{
-			return i;
+			return (int)i;
 		}
 	}
 	return -1;
