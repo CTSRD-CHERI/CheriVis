@@ -3,7 +3,7 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "CheriVis.png",
+      "filename" : "CheriVis-16.png",
       "scale" : "1x"
     },
     {
@@ -14,7 +14,7 @@
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "CheriVis.png",
+      "filename" : "CheriVis-32.png",
       "scale" : "1x"
     },
     {
@@ -23,9 +23,20 @@
       "scale" : "2x"
     },
     {
+      "size" : "64x64",
+      "idiom" : "mac",
+      "filename" : "CheriVis-64.png",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "mac",
+      "size" : "64x64",
+      "scale" : "2x"
+    },
+    {
       "size" : "128x128",
       "idiom" : "mac",
-      "filename" : "CheriVis.png",
+      "filename" : "CheriVis-128.png",
       "scale" : "1x"
     },
     {
@@ -36,7 +47,7 @@
     {
       "size" : "256x256",
       "idiom" : "mac",
-      "filename" : "CheriVis.png",
+      "filename" : "CheriVis-256.png",
       "scale" : "1x"
     },
     {
@@ -47,7 +58,7 @@
     {
       "size" : "512x512",
       "idiom" : "mac",
-      "filename" : "CheriVis.png",
+      "filename" : "CheriVis-512.png",
       "scale" : "1x"
     },
     {
