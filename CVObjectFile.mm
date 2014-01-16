@@ -266,37 +266,3 @@ bool extractSymbolInfo(T &si,
 	                          forObjectFile: self];
 }
 @end
-
-#include <dlfcn.h>
-#include <unordered_map>
-
-static std::unordered_map<std::string, ObjectFile*> cachedObjects;
-
-extern "C" const char *sym_for_address(char *addr)
-{
-	Dl_info info;
-	if (dladdr(addr, &info))
-	{
-		std::string fname(info.dli_fname);
-		ObjectFile *OF = cachedObjects[fname];
-		if (OF == 0)
-		{
-			OF = ObjectFile::createObjectFile(info.dli_fname);
-			cachedObjects[fname] = OF;
-		}
-		char *sstart = (char*)info.dli_fbase;
-		uint64_t offset = addr - sstart;
-		symbol_iterator si = OF->begin_symbols();
-		if (findAddress(si, OF->end_symbols(), offset))
-		{
-			StringRef Name;
-			error_code ec = si->getName(Name);
-			if (ec)
-			{
-				return "<Unknown>";
-			}
-			return Name.str().c_str();
-		}
-	}
-	return "<Unknown>";
-}
