@@ -170,6 +170,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 @implementation CVStreamTrace
 {
 	std::map<NSInteger,struct RegisterState> registerKeyframes;
+	NSUInteger currentIndex;
 	struct RegisterState currentState;
 	CVStreamTraceCache *cache;
 	NSInteger length;
@@ -177,6 +178,8 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	CVDisassembler *disassembler;
 	NSMutableIndexSet *kernelRanges;
 	NSMutableIndexSet *userspaceRanges;
+	NSMutableDictionary *notes;
+	NSString *notesFileName;
 }
 - (void) notifyLoaded: (NSInteger)lastIndex finished: (BOOL)isDone
 {
@@ -206,7 +209,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 		[userspaceRanges addIndexesInRange: aRange];
 	}
 }
-- (id)initWithTraceData: (NSData*)aTrace
+- (id)initWithTraceData: (NSData*)aTrace notesFileName: (NSString*)aString
 {
 	if (nil == (self = [super init])) { return nil; }
 	trace = aTrace;
@@ -260,6 +263,24 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 			[[self inMainThread] notifyLoaded: i finished: YES];
 		});
 
+	notesFileName = aString;
+	if ([[NSFileManager defaultManager] fileExistsAtPath: aString])
+	{
+		NSError *error;
+		notes =
+		    [NSJSONSerialization JSONObjectWithData: [NSData dataWithContentsOfFile: aString]
+			                                options: NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+		                                      error: &error];
+		if (error)
+		{
+			[NSApp presentError: error];
+		}
+	}
+	else
+	{
+		notes = [NSMutableDictionary new];
+	}
+
 	cache = [[CVStreamTraceCache alloc] initWithInitialValue: currentState
 	                                               traceData: aTrace
 	                                              startIndex: 0
@@ -293,6 +314,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	{
 		return NO;
 	}
+	currentIndex = anIndex;
 	// See if we can satisfy this from the cache
 	NSInteger cacheStart = cache.start;
 	if (cacheStart <= anIndex && (cacheStart + cache.length) > anIndex)
@@ -371,6 +393,27 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 - (BOOL)isKernel
 {
 	return isKernelAddress(currentState.pc);
+}
+- (NSString*)notes
+{
+	NSString *key = [NSString stringWithFormat: @"%lld", (long long)currentIndex];
+	return [notes objectForKey: key];
+}
+- (void)setNotes: (NSString*)aString
+{
+	NSString *key = [NSString stringWithFormat: @"%lld", (long long)currentIndex];
+	[notes setObject: aString forKey: key];
+	NSError *error;
+	NSLog(@"Notes: %@", notes);
+	NSData *json = [NSJSONSerialization dataWithJSONObject: notes
+												   options: NSJSONWritingPrettyPrinted
+													 error: &error];
+	if (error)
+	{
+		[NSApp presentError:error];
+		return;
+	}
+	[json writeToFile: notesFileName atomically: YES];
 }
 @end
 

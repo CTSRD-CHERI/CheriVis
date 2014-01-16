@@ -350,7 +350,9 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	if (file != nil)
 	{
 		NSData *traceData = [NSData dataWithContentsOfMappedFile: file];
-		streamTrace = [[CVStreamTrace alloc] initWithTraceData: traceData];
+		NSString *notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
+		streamTrace = [[CVStreamTrace alloc] initWithTraceData: traceData
+		                                         notesFileName: notesFile];
 		[traceView reloadData];
 		integerRegisterNames = [streamTrace integerRegisterNames];
 	}
@@ -440,6 +442,11 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 			}
 			return stringWithColor(instr, textColor);
 		}
+		if ([@"index" isEqualToString: columnId])
+		{
+			return [NSString stringWithFormat: @"%lld", (long long)rowIndex];
+		}
+		return [streamTrace notes];
 	}
 
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
@@ -458,6 +465,18 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		return stringWithColor(value, [NSColor redColor]);
 	}
 	return nil;
+}
+- (void)tableView: (NSTableView*)aTableView
+   setObjectValue: (id)anObject
+   forTableColumn: (NSTableColumn*)aTableColumn
+			  row: (NSInteger)rowIndex
+{
+	if (!((aTableView == traceView) && [@"notes" isEqualToString: [aTableColumn identifier]]))
+	{
+		return;
+	}
+	[streamTrace setStateToIndex: rowIndex];
+	[streamTrace setNotes: [anObject description]];
 }
 - (CVFunction*)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
 {
