@@ -74,7 +74,7 @@ static int registerIndexForLLVMRegNo(unsigned regNo)
 	return registerIndexForString(regStream.str().c_str());
 }
 
-static MCDisassembler::DecodeStatus disassembleInstruction(uint64_t anInstruction,
+static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstruction,
                                                            MCInst &inst)
 {
 	anInstruction = NSSwapBigIntToHost(anInstruction);
