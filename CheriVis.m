@@ -174,6 +174,9 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	       selector: @selector(loadedEntries:)
 	           name: CVStreamTraceLoadedEntriesNotification
 	         object: nil];
+#ifndef GNUSTEP
+	[mainWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
+#endif
 
 }
 - (void)setMessage: (NSString*)aString forKey: (id)aKey
