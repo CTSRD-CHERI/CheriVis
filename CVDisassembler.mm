@@ -188,15 +188,23 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 	InitializeAllTargetMCs();
 	InitializeAllAsmParsers();
 	InitializeAllDisassemblers();
-	//std::string triple("cheri-unknown-freebsd");
-	std::string triple("mips64-unknown-freebsd");
+	std::string cheriTriple("cheri-unknown-freebsd");
+	std::string mipsTriple("mips64-unknown-freebsd");
+	std::string triple = cheriTriple;
 	std::string features("");
 
 	std::string Error;
-	target = TargetRegistry::lookupTarget(triple, Error);
+	target = TargetRegistry::lookupTarget(cheriTriple, Error);
+	// First try to set up the target for CHERI, if it doesn't work then fall back to MIPS
 	if (target == 0)
 	{
-		NSLog(@"Failed to initialise target: %s\n", Error.c_str());
+		target = TargetRegistry::lookupTarget(mipsTriple, Error);
+		triple = mipsTriple;
+	}
+	if (target == 0)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Failed to initialise target: %s\n", Error.c_str()];
 	}
 	mri.reset(target->createMCRegInfo(triple));
 	NSAssert(mri.isValid(), @"Failed to create MCRegisterInfo");
