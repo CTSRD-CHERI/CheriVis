@@ -2,6 +2,9 @@
 #include <map>
 #import <Foundation/Foundation.h>
 #import <dispatch/dispatch.h>
+#ifndef DISPATCH_QUEUE_PRIORITY_BACKGROUND
+#define DISPATCH_QUEUE_PRIORITY_BACKGROUND DISPATCH_QUEUE_PRIORITY_LOW
+#endif
 
 #import "CVStreamTrace.h"
 #include <assert.h>
