@@ -55,6 +55,10 @@
  */
 - (uint32_t)encodedInstruction;
 /**
+ * Returns the number of dead cycles before this instruction.
+ */
+- (NSUInteger)deadCycles;
+/**
  * Returns an array of the integer registers whose value can be inferred at
  * this point in the trace.  Values that can not be inferred are represented by
  * the placeholder string "???".

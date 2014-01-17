@@ -445,12 +445,20 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		{
 			NSColor *textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
 			NSString *instr = [streamTrace instruction];
+			NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
 			uint8_t ex = [streamTrace exception];
 			if (ex != 31)
 			{
-				instr = [NSString stringWithFormat: @"%@ [ Exception 0x%x ]", instr, ex];
+				[field appendAttributedString: stringWithColor(@" [ Exception 0x%x ]", [NSColor redColor])];
 			}
-			return stringWithColor(instr, textColor);
+			NSUInteger deadCycles = [streamTrace deadCycles];
+			if (deadCycles > 0)
+			{
+				NSString *str = [NSString stringWithFormat: @" ; %lld dead cycles", (long long)deadCycles];
+				[field appendAttributedString: stringWithColor(str, [NSColor blueColor])];
+
+			}
+			return field;
 		}
 		if ([@"index" isEqualToString: columnId])
 		{
@@ -597,23 +605,32 @@ writeRowsWithIndexes:(NSIndexSet*)rowIndexes
 		[str appendAttributedString: cellValue];
 		    NSColor *textColor = [streamTrace isKernel] ?
 		        [CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64 "\t",
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64,
 		                                             [streamTrace programCounter]], textColor)];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x\t",
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x",
 		                                             [streamTrace encodedInstruction]], [NSColor blackColor])];
 		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
+		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
 		NSString *instr = [streamTrace instruction];
+		NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
 		uint8_t ex = [streamTrace exception];
 		if (ex != 31)
 		{
-			instr = [NSString stringWithFormat: @"%@ [ Exception 0x%x ]\t", instr, ex];
+			[field appendAttributedString: stringWithColor(@" [ Exception 0x%x ]", [NSColor redColor])];
 		}
-		else
+		NSUInteger deadCycles = [streamTrace deadCycles];
+		if (deadCycles > 0)
 		{
-			instr = [NSString stringWithFormat: @"%@\t", instr];
+			NSString *str = [NSString stringWithFormat: @" ; %lld dead cycles", (long long)deadCycles];
+			[field appendAttributedString: stringWithColor(str, [NSColor blueColor])];
+
 		}
-		[str appendAttributedString:stringWithColor(instr, textColor)];
-		cellValue =	[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@\n", [streamTrace notes]]];
+		[str appendAttributedString:field];
+		NSString *notes = [streamTrace notes];
+		if (notes != nil)
+		{
+			cellValue =	[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"\t%@\n", notes]];
+		}
 		[str appendAttributedString: cellValue];
 	}];
 

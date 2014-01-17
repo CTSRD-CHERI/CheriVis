@@ -31,6 +31,7 @@ struct cheri_debug_trace_entry_disk {
 struct RegisterState
 {
 	uint16_t cycle_count;
+	uint16_t deadCycles;
 	uint32_t instr;
 	uint8_t  exception;
 	CVInstructionType instructionType;
@@ -112,6 +113,14 @@ static BOOL isKernelAddress(uint64_t anAddress)
 		*rs = *ors;
 		rs->pc = NSSwapBigLongLongToHost(traceEntry.pc);
 		rs->cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
+		if (rs->cycle_count < ors->cycle_count)
+		{
+			rs->deadCycles = (rs->cycle_count - ors->cycle_count) + 1023;
+		}
+		else
+		{
+			rs->deadCycles = (rs->cycle_count - ors->cycle_count) - 1;
+		}
 		rs->exception = traceEntry.exception;
 		rs->instr = traceEntry.inst;
 		if (traceEntry.version == 1 || traceEntry.version == 2)
@@ -170,7 +179,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 @implementation CVStreamTrace
 {
 	std::map<NSInteger,struct RegisterState> registerKeyframes;
-	NSUInteger currentIndex;
+	NSInteger currentIndex;
 	struct RegisterState currentState;
 	CVStreamTraceCache *cache;
 	NSInteger length;
@@ -221,7 +230,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
 		^(void) {
 			CVDisassembler *dis = [CVDisassembler new];
-			struct RegisterState rs = {0,0,0,CVInstructionTypeUnknown,0,0,{0}};
+			struct RegisterState rs = {0,0,0,0,CVInstructionTypeUnknown,0,0,{0}};
 			BOOL lastWasKernel = NO;
 			NSRange currentRange = {0,0};
 			NSUInteger i;
@@ -314,6 +323,10 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	{
 		return NO;
 	}
+	if (currentIndex == anIndex)
+	{
+		return YES;
+	}
 	currentIndex = anIndex;
 	// See if we can satisfy this from the cache
 	NSInteger cacheStart = cache.start;
@@ -325,7 +338,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	// We can't, so let's find the relevant part of the cache
 	NSInteger keyFrameIndex = anIndex / CacheSize;
 	auto keyFrame = registerKeyframes.find(keyFrameIndex-1);
-	struct RegisterState ors = {0,0,0,CVInstructionTypeUnknown,0,0,{0}};
+	struct RegisterState ors = {0,0,0,0,CVInstructionTypeUnknown,0,0,{0}};
 
 	if (keyFrame != registerKeyframes.end())
 	{
@@ -393,6 +406,10 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 - (BOOL)isKernel
 {
 	return isKernelAddress(currentState.pc);
+}
+- (NSUInteger)deadCycles
+{
+	return currentState.deadCycles;
 }
 - (NSString*)notes
 {
