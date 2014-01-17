@@ -163,6 +163,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	 * The number of entries that were loaded last time we did a redisplay
 	 */
 	NSUInteger lastLoaded;
+	/**
+	 * The location of the stream trace.  Used to look for files.
+	 */
+	NSString *traceDirectory;
 }
 - (void)awakeFromNib
 {
@@ -365,6 +369,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		                                         notesFileName: notesFile];
 		[traceView reloadData];
 		integerRegisterNames = [streamTrace integerRegisterNames];
+		traceDirectory = [file stringByDeletingLastPathComponent];
 	}
 }
 - (IBAction)openProcstat: (id)sender
@@ -518,21 +523,39 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	CVObjectFile *objectFile = [objectFiles objectForKey: range.fileName];
 	if (nil == objectFile)
 	{
-		NSString *path = openFile([NSString stringWithFormat: @"Open object file: %@", range.fileName]);
-		if (path != nil)
+		NSFileManager *fm = [NSFileManager defaultManager];
+		NSString *fileName = range.fileName;
+		NSString *path = [traceDirectory stringByAppendingPathComponent: [fileName lastPathComponent]];
+		if ([fm fileExistsAtPath: path])
 		{
 			objectFile = [CVObjectFile objectFileForFilePath: path];
-			if (objectFile == nil)
-			{
-				[[NSAlert alertWithMessageText: @"Unable to open object file"
-				                 defaultButton: nil
-				               alternateButton: nil
-				                   otherButton: nil
-				     informativeTextWithFormat: @""] runModal];
-				return nil;
-			}
-			[objectFiles setObject: objectFile forKey: range.fileName];
 		}
+		if (objectFile == nil)
+		{
+			path = [traceDirectory stringByAppendingPathComponent: fileName];
+			if ([fm fileExistsAtPath: path])
+			{
+				objectFile = [CVObjectFile objectFileForFilePath: path];
+			}
+		}
+		if (objectFile == nil)
+		{
+			path = openFile([NSString stringWithFormat: @"Open object file: %@", fileName]);
+			if (path != nil)
+			{
+				objectFile = [CVObjectFile objectFileForFilePath: path];
+				if (objectFile == nil)
+				{
+					[[NSAlert alertWithMessageText: @"Unable to open object file"
+					                 defaultButton: nil
+					               alternateButton: nil
+					                   otherButton: nil
+					     informativeTextWithFormat: @""] runModal];
+					return nil;
+				}
+			}
+		}
+		[objectFiles setObject: objectFile forKey: range.fileName];
 	}
 	BOOL isRelocated = NO;
 	if ([[range.fileName lastPathComponent] rangeOfString: @".so"].location != NSNotFound)
