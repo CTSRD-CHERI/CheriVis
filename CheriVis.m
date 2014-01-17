@@ -188,10 +188,11 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	       selector: @selector(loadedEntries:)
 	           name: CVStreamTraceLoadedEntriesNotification
 	         object: nil];
-#ifndef GNUSTEP
-	[mainWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-#endif
-
+	[[NSNotificationCenter defaultCenter]
+		addObserver: self
+		   selector: @selector(selectRange:)
+	           name: CVCallGraphSelectionChangedNotification
+	         object: nil];
 }
 - (void)setMessage: (NSString*)aString forKey: (id)aKey
 {
