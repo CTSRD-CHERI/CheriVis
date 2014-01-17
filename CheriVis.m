@@ -566,7 +566,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 				}
 			}
 		}
-		[objectFiles setObject: objectFile forKey: range.fileName];
+		if (objectFile != nil)
+		{
+			[objectFiles setObject: objectFile forKey: range.fileName];
+		}
 	}
 	BOOL isRelocated = NO;
 	if ([[range.fileName lastPathComponent] rangeOfString: @".so"].location != NSNotFound)
