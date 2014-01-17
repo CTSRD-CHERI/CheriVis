@@ -11,10 +11,10 @@ APP_NAME = CheriVis
 #
 CheriVis_LANGUAGES = English
 CheriVis_RESOURCE_FILES = \
-	CheriVis.gorm\
+	CheriVis/Base.lproj/MainMenu.xib \
 	CheriVis.tiff
 CheriVis_APPLICATION_ICON = CheriVis.tiff
-CheriVis_MAIN_MODEL_FILE = CheriVis.gorm
+CheriVis_MAIN_MODEL_FILE = MainMenu.xib
 
 #
 # Source code
