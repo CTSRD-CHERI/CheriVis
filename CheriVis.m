@@ -464,7 +464,9 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		{
 			return [NSString stringWithFormat: @"%lld", (long long)rowIndex];
 		}
-		return [streamTrace notes];
+		NSString *notes = [streamTrace notes];
+		// Work around a GNUstep bug where nil in a table view is not editable.
+		return notes ? notes : @" ";
 	}
 
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
