@@ -475,6 +475,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	if ([@"value" isEqualToString: columnId])
 	{
 		id value = [integerRegisterValues objectAtIndex: rowIndex];
+		if (value == nil)
+		{
+			return nil;
+		}
 		if ([value isKindOfClass: [NSNumber class]])
 		{
 			return stringWithColor([NSString stringWithFormat: @"0x%.16llx", [value longLongValue]], [NSColor blackColor]);
