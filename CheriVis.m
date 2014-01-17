@@ -616,7 +616,6 @@ writeRowsWithIndexes:(NSIndexSet*)rowIndexes
 		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x",
 		                                             [streamTrace encodedInstruction]], [NSColor blackColor])];
 		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
-		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
 		NSString *instr = [streamTrace instruction];
 		NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
 		uint8_t ex = [streamTrace exception];
