@@ -23,17 +23,6 @@
       "scale" : "2x"
     },
     {
-      "size" : "64x64",
-      "idiom" : "mac",
-      "filename" : "CheriVis-64.png",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "mac",
-      "size" : "64x64",
-      "scale" : "2x"
-    },
-    {
       "size" : "128x128",
       "idiom" : "mac",
       "filename" : "CheriVis-128.png",
