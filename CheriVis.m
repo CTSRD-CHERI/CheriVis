@@ -627,10 +627,8 @@ writeRowsWithIndexes:(NSIndexSet*)rowIndexes
 		}
 		[str appendAttributedString:field];
 		NSString *notes = [streamTrace notes];
-		if (notes != nil)
-		{
-			cellValue =	[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"\t%@\n", notes]];
-		}
+		notes = notes ? [NSString stringWithFormat: @"\t%@\n", notes] : @"\n";
+		cellValue =	[[NSAttributedString alloc] initWithString: notes];
 		[str appendAttributedString: cellValue];
 	}];
 
