@@ -63,6 +63,16 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		return ([string rangeOfString: pattern].location != NSNotFound);
 	}
 }
+
+@implementation NSTableView (Copy)
+- (IBAction)copy:(id)sender
+{
+	[[self dataSource] tableView: self
+	        writeRowsWithIndexes: [self selectedRowIndexes]
+	                toPasteboard: [NSPasteboard generalPasteboard]];
+}
+@end
+
 /**
  * The CheriVis class implements the controller for the CheriVis application.
  * A single instance of it is created in the main nib file for the application.
@@ -557,6 +567,61 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		         withBaseAddress: [func baseAddress] + (isRelocated ? rs : 0)];
 		[disassembly scrollAddressToVisible: pc + (isRelocated ? rs : 0)];
 	}
+}
+-    (BOOL)tableView:(NSTableView*)aTableView
+writeRowsWithIndexes:(NSIndexSet*)rowIndexes
+        toPasteboard:(NSPasteboard*)pboard
+{
+	if (aTableView != traceView)
+	{
+		return NO;
+	}
+	[pboard declareTypes: [NSArray arrayWithObjects: NSRTFPboardType, NSStringPboardType, nil]
+	               owner: nil];
+	NSMutableAttributedString *str = [NSMutableAttributedString new];
+	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger rowIndex, BOOL *shouldStop) {
+		BOOL showKern = [showKernel state] == NSOnState;
+		BOOL showUser = [showUserspace state] == NSOnState;
+		if (showKern && !showUser)
+		{
+			rowIndex = [streamTrace kernelTraceEntryAtIndex: rowIndex];
+		}
+		else if (showUser && !showKern)
+		{
+			rowIndex = [streamTrace userspaceTraceEntryAtIndex: rowIndex];
+		}
+		[streamTrace setStateToIndex: rowIndex];
+		NSString *cellString = [NSString stringWithFormat:@"%lld\t", (long long)rowIndex];
+		NSAttributedString *cellValue =
+		    [[NSAttributedString alloc] initWithString: cellString];
+		[str appendAttributedString: cellValue];
+		    NSColor *textColor = [streamTrace isKernel] ?
+		        [CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64 "\t",
+		                                             [streamTrace programCounter]], textColor)];
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x\t",
+		                                             [streamTrace encodedInstruction]], [NSColor blackColor])];
+		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
+		NSString *instr = [streamTrace instruction];
+		uint8_t ex = [streamTrace exception];
+		if (ex != 31)
+		{
+			instr = [NSString stringWithFormat: @"%@ [ Exception 0x%x ]\t", instr, ex];
+		}
+		else
+		{
+			instr = [NSString stringWithFormat: @"%@\t", instr];
+		}
+		[str appendAttributedString:stringWithColor(instr, textColor)];
+		cellValue =	[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@\n", [streamTrace notes]]];
+		[str appendAttributedString: cellValue];
+	}];
+
+	[pboard setData: [str RTFFromRange: NSMakeRange(0, [str length]-1)
+	                documentAttributes: nil]
+	        forType: NSRTFPboardType];
+	[pboard setData: [[str string] dataUsingEncoding: NSUTF8StringEncoding] forType: NSStringPboardType];
+	return YES;
 }
 - (IBAction)changeDisplay: (id)sender
 {
