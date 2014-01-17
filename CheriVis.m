@@ -231,6 +231,13 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	}
 	lastLoaded = loaded;
 }
+- (void)selectRange: (NSNotification*)aNotification
+{
+	NSRange r = [[[aNotification userInfo] objectForKey: kCVCallGraphSelectedAddressRange] rangeValue];
+	[traceView selectRowIndexes: [NSIndexSet indexSetWithIndexesInRange: r]
+		   byExtendingSelection: NO];
+	[traceView scrollRowToVisible: r.location];
+}
 - (void)searchWithIncrement: (NSUInteger)increment
 {
 	NSInteger end = [traceView selectedRow];
@@ -380,18 +387,21 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		NSString *procstat = [NSString stringWithContentsOfFile: file];
 		addressMap = [[CVAddressMap alloc] initWithProcstatOutput: procstat];
 	}
+}
+- (IBAction)callGraph:(id)sender
+{
 	// Currently disabled.  Eventually, we should construct a call graph from a
 	// specific range.
-#if 0
 	if ((addressMap != nil) && (streamTrace != nil))
 	{
-		[[CVCallGraph alloc] initWithStreamTrace: streamTrace
-		                              addressMap: addressMap
-		                     functionLookupBlock: ^(uint64_t pc) {
-			return [self functionForPC: &pc isRelocated: NULL rangeStart: NULL];
-		 }];
+		[callGraph showStreamTrace: streamTrace
+					    addressMap: addressMap
+					 indexesToShow: [traceView selectedRowIndexes]
+			   functionLookupBlock: ^(uint64_t pc) {
+							return [self functionForPC: &pc isRelocated: NULL rangeStart: NULL];
+						}];
 	}
-#endif
+
 }
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {

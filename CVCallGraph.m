@@ -7,19 +7,22 @@
 
 #import <Cocoa/Cocoa.h>
 
+NSString *CVCallGraphSelectionChangedNotification = @"CVCallGraphSelectionChangedNotification";
+NSString *kCVCallGraphSelectedAddressRange = @"CVCallGraphSelectionChangedNotification";
+
 @interface CVCallGraphEntry : NSObject
+/**
+ * The point in the stream trace where the function is entered.
+ */
+@property (readonly) NSInteger entryPoint;
+/**
+ * The point in the stream trace where the function is exited.
+ */
+@property (readonly) NSInteger exitPoint;
 @end
 
 @implementation CVCallGraphEntry
 {
-	/**
-	 * The point in the stream trace where the function is entered.
-	 */
-	NSInteger entryPoint;
-	/**
-	 * The point in the stream trace where the function is exited.
-	 */
-	NSInteger exitPoint;
 	/**
 	 * The function that is currently being executed.
 	 */
@@ -37,6 +40,7 @@
 	 */
 	BOOL inKernel;
 }
+@synthesize entryPoint, exitPoint;
 - (void)pushChild: (CVCallGraphEntry*)aChild
 {
 	if (children == nil)
@@ -65,21 +69,20 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 	[aTrace setStateToIndex: anIndex];
 	inKernel = [aTrace isKernel];
 
-
 	function = lookupBlock(pc);
 	NSInteger end = [trace numberOfTraceEntries];
+	BOOL expectingCall = NO;
 	for (exitPoint=entryPoint+1 ; exitPoint<end ;
 	     exitPoint = [anIndexSet indexGreaterThanIndex: exitPoint])
 	{
 		[aTrace setStateToIndex: exitPoint];
-		BOOL isCall = NO;
 		if ([aTrace isKernel] != inKernel)
 		{
 			if (!isKernelCall)
 			{
 				break;
 			}
-			isCall = YES;
+			expectingCall = YES;
 		}
 		else
 		{
@@ -88,27 +91,33 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 			{
 				break;
 			}
-			if ([aDisassembler isCallInstruction: instr])
+			if ([aDisassembler isCallInstruction: instr] ||
+			    ([aDisassembler typeOfInstruction: instr] == CVInstructionTypeFlowControl))
 			{
-				isCall = YES;
+				expectingCall = YES;
 			}
 		}
-		if (isCall)
+		CVFunction *nextFunction = lookupBlock([aTrace programCounter]);
+		if (![nextFunction isEqual: function])
 		{
-			CVCallGraphEntry *newEntry = [[CVCallGraphEntry alloc]
-			               initWithTrace: aTrace
-			                   fromIndex: exitPoint
-			                     toIndex: &exitPoint
-			               indexesToShow: anIndexSet
-			            withDisassembler: aDisassembler
-			                  addressMap: anAddressMap
-			         functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock
-			      kernelTransitionIsCall: !isKernelCall];
-			if (children == nil)
+			if (expectingCall)
 			{
-				children = [NSMutableArray new];
+				CVCallGraphEntry *newEntry = [[CVCallGraphEntry alloc]
+				               initWithTrace: aTrace
+				                   fromIndex: exitPoint
+				                     toIndex: &exitPoint
+				               indexesToShow: anIndexSet
+				            withDisassembler: aDisassembler
+				                  addressMap: anAddressMap
+				         functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock
+				      kernelTransitionIsCall: !isKernelCall];
+				if (children == nil)
+				{
+					children = [NSMutableArray new];
+				}
+				[children addObject: newEntry];
 			}
-			[children addObject: newEntry];
+			break;
 		}
 	}
 	if (endIndex)
@@ -116,6 +125,10 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 		*endIndex = exitPoint;
 	}
 	return self;
+}
+- (NSString*)description
+{
+	return [function demangledName];
 }
 - (void)dumpWithTabs: (NSInteger)tabIndex
 {
@@ -141,6 +154,14 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 {
 	[self dumpWithTabs: 0];
 }
+- (NSInteger)numberOfChildren
+{
+	return [children count];
+}
+- (CVCallGraphEntry*)childAtIndex: (NSInteger)anIndex
+{
+	return [children objectAtIndex: anIndex];
+}
 @end
 
 @implementation CVCallGraph
@@ -149,14 +170,20 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 	 * The root entry in the call graph.
 	 */
 	CVCallGraphEntry *root;
-
+	/**
+	 * The window that contains the call graph.
+	 */
+	IBOutlet __unsafe_unretained NSWindow *callGraphWindow;
+	/**
+	 * The outline view that contains the call graph.
+	 */
+	IBOutlet __unsafe_unretained NSOutlineView *outline;
 }
-- (id)initWithStreamTrace: (CVStreamTrace*)aTrace
-               addressMap: (CVAddressMap*)anAddressMap
-            indexesToShow: (NSIndexSet*)anIndexSet
-      functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock
+- (void)showStreamTrace: (CVStreamTrace*)aTrace
+             addressMap: (CVAddressMap*)anAddressMap
+          indexesToShow: (NSIndexSet*)anIndexSet
+    functionLookupBlock: (CVFunction*(^)(uint64_t))lookupBlock
 {
-	if (nil == (self = [super init])) { return nil; }
 	NSInteger end = [anIndexSet lastIndex];
 	NSInteger parsedEnd;
 	NSInteger start = [anIndexSet firstIndex];
@@ -181,8 +208,38 @@ kernelTransitionIsCall: (BOOL)isKernelCall
 		                        kernelTransitionIsCall: YES];
 		[root pushChild: incompleteChild];
 	}
+	[callGraphWindow makeKeyAndOrderFront: self];
+	[outline reloadData];
 	[root dump];
-	return self;
 }
-
+- (id)outlineView:(NSOutlineView*)outlineView child:(NSInteger)index ofItem:(id)item
+{
+	if (item == nil)
+	{
+		return root;
+	}
+	return [item childAtIndex: index];
+}
+- (NSInteger)outlineView:(NSOutlineView*)outlineView numberOfChildrenOfItem:(id)item
+{
+	return (item == nil) ? 1 : [item numberOfChildren];
+}
+- (BOOL)outlineView:(NSOutlineView*)outlineView isItemExpandable:(id)item
+{
+	return (item == nil) || ([item numberOfChildren] > 0);
+}
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+	return [item description];
+}
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+	CVCallGraphEntry *entry = [outline itemAtRow:[outline selectedRow]];
+	NSValue *range = [NSValue valueWithRange: NSMakeRange(entry.entryPoint, entry.exitPoint - entry.entryPoint)];
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObject: range
+														 forKey: kCVCallGraphSelectedAddressRange];
+	[[NSNotificationCenter defaultCenter] postNotificationName: CVCallGraphSelectionChangedNotification
+														object: self
+													  userInfo: userInfo];
+}
 @end
