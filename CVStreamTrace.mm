@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <map>
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #import <dispatch/dispatch.h>
 #ifndef DISPATCH_QUEUE_PRIORITY_BACKGROUND
 #define DISPATCH_QUEUE_PRIORITY_BACKGROUND DISPATCH_QUEUE_PRIORITY_LOW
