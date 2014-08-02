@@ -7,7 +7,7 @@
  * object view in CheriVis.  A single instance of this class is created in the
  * main nib.
  */
-@interface CVDisassemblyController : NSObject
+@interface CVDisassemblyController : NSObject <NSTableViewDataSource>
 /**
  * Makes the specified address in the disassembly visible.
  */

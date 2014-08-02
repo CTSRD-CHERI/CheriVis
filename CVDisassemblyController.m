@@ -5,6 +5,11 @@
 #import "CVColors.h"
 #import <Cocoa/Cocoa.h>
 
+BOOL WriteTableViewToPasteboard(id<NSTableViewDataSource> data,
+                                NSTableView *aTableView,
+                                NSIndexSet *rowIndexes,
+                                NSPasteboard *pboard);
+
 /**
  * Helper function that creates an attributed string by applying a single
  * colour and a fixed-width font to a string.
@@ -104,6 +109,12 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		[demangledNameField setStringValue: [aFunction demangledName]];
 		[disassembly reloadData];
 	}
+}
+-    (BOOL)tableView:(NSTableView*)aTableView
+writeRowsWithIndexes:(NSIndexSet*)rowIndexes
+        toPasteboard:(NSPasteboard*)pboard
+{
+	return WriteTableViewToPasteboard(self, aTableView, rowIndexes, pboard);
 }
 @end
 
