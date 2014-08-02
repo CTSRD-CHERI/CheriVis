@@ -648,9 +648,9 @@ writeRowsWithIndexes:(NSIndexSet*)rowIndexes
 		[str appendAttributedString: cellValue];
 		    NSColor *textColor = [streamTrace isKernel] ?
 		        [CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64,
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64 "\t",
 		                                             [streamTrace programCounter]], textColor)];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x",
+		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x\t",
 		                                             [streamTrace encodedInstruction]], [NSColor blackColor])];
 		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
 		NSString *instr = [streamTrace instruction];
