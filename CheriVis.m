@@ -623,57 +623,27 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 writeRowsWithIndexes:(NSIndexSet*)rowIndexes
         toPasteboard:(NSPasteboard*)pboard
 {
-	if (aTableView != traceView)
-	{
-		return NO;
-	}
 	[pboard declareTypes: [NSArray arrayWithObjects: NSRTFPboardType, NSStringPboardType, nil]
 	               owner: nil];
 	NSMutableAttributedString *str = [NSMutableAttributedString new];
+	NSArray *tableColumns = [aTableView tableColumns];
+	NSAttributedString *tab = [[NSAttributedString alloc] initWithString: @"\t"];
+	NSAttributedString *nl = [[NSAttributedString alloc] initWithString: @"\n"];
 	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger rowIndex, BOOL *shouldStop) {
-		BOOL showKern = [showKernel state] == NSOnState;
-		BOOL showUser = [showUserspace state] == NSOnState;
-		if (showKern && !showUser)
+		for (NSTableColumn *column in tableColumns)
 		{
-			rowIndex = [streamTrace kernelTraceEntryAtIndex: rowIndex];
+			NSAttributedString *cellValue = [self tableView: aTableView
+			                      objectValueForTableColumn: column
+			                                            row: rowIndex];
+			if (![cellValue isKindOfClass: [NSAttributedString class]])
+			{
+				cellValue = [[NSAttributedString alloc] initWithString: [cellValue description]];
+			}
+			[str appendAttributedString: cellValue];
+			[str appendAttributedString: tab];
 		}
-		else if (showUser && !showKern)
-		{
-			rowIndex = [streamTrace userspaceTraceEntryAtIndex: rowIndex];
-		}
-		[streamTrace setStateToIndex: rowIndex];
-		NSString *cellString = [NSString stringWithFormat:@"%lld\t", (long long)rowIndex];
-		NSAttributedString *cellValue =
-		    [[NSAttributedString alloc] initWithString: cellString];
-		[str appendAttributedString: cellValue];
-		    NSColor *textColor = [streamTrace isKernel] ?
-		        [CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64 "\t",
-		                                             [streamTrace programCounter]], textColor)];
-		[str appendAttributedString: stringWithColor([NSString stringWithFormat: @"0x%.8x\t",
-		                                             [streamTrace encodedInstruction]], [NSColor blackColor])];
-		textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
-		NSString *instr = [streamTrace instruction];
-		NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
-		uint8_t ex = [streamTrace exception];
-		if (ex != 31)
-		{
-			[field appendAttributedString: stringWithColor([NSString stringWithFormat:@" [ Exception 0x%x ]", ex], [NSColor redColor])];
-		}
-		NSUInteger deadCycles = [streamTrace deadCycles];
-		if (deadCycles > 0)
-		{
-			NSString *str = [NSString stringWithFormat: @" ; %lld dead cycles", (long long)deadCycles];
-			[field appendAttributedString: stringWithColor(str, [NSColor blueColor])];
-
-		}
-		[str appendAttributedString:field];
-		NSString *notes = [streamTrace notes];
-		notes = notes ? [NSString stringWithFormat: @"\t%@\n", notes] : @"\n";
-		cellValue =	[[NSAttributedString alloc] initWithString: notes];
-		[str appendAttributedString: cellValue];
+		[str appendAttributedString: nl];
 	}];
-
 	[pboard setData: [str RTFFromRange: NSMakeRange(0, [str length]-1)
 	                documentAttributes: nil]
 	        forType: NSRTFPboardType];
