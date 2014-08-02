@@ -465,7 +465,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 			uint8_t ex = [streamTrace exception];
 			if (ex != 31)
 			{
-				[field appendAttributedString: stringWithColor(@" [ Exception 0x%x ]", [NSColor redColor])];
+				[field appendAttributedString: stringWithColor([NSString stringWithFormat:@" [ Exception 0x%x ]", ex], [NSColor redColor])];
 			}
 			NSUInteger deadCycles = [streamTrace deadCycles];
 			if (deadCycles > 0)
@@ -658,7 +658,7 @@ writeRowsWithIndexes:(NSIndexSet*)rowIndexes
 		uint8_t ex = [streamTrace exception];
 		if (ex != 31)
 		{
-			[field appendAttributedString: stringWithColor(@" [ Exception 0x%x ]", [NSColor redColor])];
+			[field appendAttributedString: stringWithColor([NSString stringWithFormat:@" [ Exception 0x%x ]", ex], [NSColor redColor])];
 		}
 		NSUInteger deadCycles = [streamTrace deadCycles];
 		if (deadCycles > 0)
