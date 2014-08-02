@@ -9,6 +9,41 @@
 @interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
 @end
 
+/**
+ * Convenience function that writes the contents of a table view to a pasteboard in RTF format.
+ */
+BOOL WriteTableViewToPasteboard(id<NSTableViewDataSource> data,
+                                NSTableView *aTableView,
+                                NSIndexSet *rowIndexes,
+                                NSPasteboard *pboard)
+{
+	[pboard declareTypes: [NSArray arrayWithObjects: NSRTFPboardType, NSStringPboardType, nil]
+	               owner: nil];
+	NSMutableAttributedString *str = [NSMutableAttributedString new];
+	NSArray *tableColumns = [aTableView tableColumns];
+	NSAttributedString *tab = [[NSAttributedString alloc] initWithString: @"\t"];
+	NSAttributedString *nl = [[NSAttributedString alloc] initWithString: @"\n"];
+	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger rowIndex, BOOL *shouldStop) {
+		for (NSTableColumn *column in tableColumns)
+		{
+			NSAttributedString *cellValue = [data tableView: aTableView
+			                      objectValueForTableColumn: column
+			                                            row: rowIndex];
+			if (![cellValue isKindOfClass: [NSAttributedString class]])
+			{
+				cellValue = [[NSAttributedString alloc] initWithString: [cellValue description]];
+			}
+			[str appendAttributedString: cellValue];
+			[str appendAttributedString: tab];
+		}
+		[str appendAttributedString: nl];
+	}];
+	[pboard setData: [str RTFFromRange: NSMakeRange(0, [str length]-1)
+	                documentAttributes: nil]
+	        forType: NSRTFPboardType];
+	[pboard setData: [[str string] dataUsingEncoding: NSUTF8StringEncoding] forType: NSStringPboardType];
+	return YES;
+}
 
 /**
  * Helper function that pops up a dialog to open a file.
@@ -623,36 +658,13 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 writeRowsWithIndexes:(NSIndexSet*)rowIndexes
         toPasteboard:(NSPasteboard*)pboard
 {
-	[pboard declareTypes: [NSArray arrayWithObjects: NSRTFPboardType, NSStringPboardType, nil]
-	               owner: nil];
-	NSMutableAttributedString *str = [NSMutableAttributedString new];
-	NSArray *tableColumns = [aTableView tableColumns];
-	NSAttributedString *tab = [[NSAttributedString alloc] initWithString: @"\t"];
-	NSAttributedString *nl = [[NSAttributedString alloc] initWithString: @"\n"];
-	[rowIndexes enumerateIndexesUsingBlock: ^(NSUInteger rowIndex, BOOL *shouldStop) {
-		for (NSTableColumn *column in tableColumns)
-		{
-			NSAttributedString *cellValue = [self tableView: aTableView
-			                      objectValueForTableColumn: column
-			                                            row: rowIndex];
-			if (![cellValue isKindOfClass: [NSAttributedString class]])
-			{
-				cellValue = [[NSAttributedString alloc] initWithString: [cellValue description]];
-			}
-			[str appendAttributedString: cellValue];
-			[str appendAttributedString: tab];
-		}
-		[str appendAttributedString: nl];
-	}];
-	[pboard setData: [str RTFFromRange: NSMakeRange(0, [str length]-1)
-	                documentAttributes: nil]
-	        forType: NSRTFPboardType];
-	[pboard setData: [[str string] dataUsingEncoding: NSUTF8StringEncoding] forType: NSStringPboardType];
-	return YES;
+	return WriteTableViewToPasteboard(self, aTableView, rowIndexes, pboard);
 }
 - (IBAction)changeDisplay: (id)sender
 {
 	[traceView reloadData];
 }
 @end
+
+
 
