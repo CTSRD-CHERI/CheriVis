@@ -1,4 +1,4 @@
-#import <Foundation/NSObject.h>
+#import <AppKit/NSTableView.h>
 
 @class CVFunction;
 
