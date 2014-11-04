@@ -270,7 +270,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 					[mainThreadSelf addKeyFrame: rs atIndex: i/CacheSize];
 				}
 			}
-			[[self inMainThread] notifyLoaded: i finished: YES];
+			[mainThreadSelf notifyLoaded: i finished: YES];
 		});
 
 	notesFileName = aString;
