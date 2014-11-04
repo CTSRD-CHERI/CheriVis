@@ -322,6 +322,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		{
 			i = wrap - 1;
 		}
+		if (showKern && !showUser)
+		{
+			i = [streamTrace kernelTraceEntryAtIndex: i];
+		}
+		else if (showUser && !showKern)
+		{
+			i = [streamTrace userspaceTraceEntryAtIndex: i];
+		}
 		[streamTrace setStateToIndex: i];
 		if (addrs)
 		{
