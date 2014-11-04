@@ -4,20 +4,16 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/StringRefMemoryObject.h"
 #include "llvm/MC/MCAsmInfo.h"
-#include "llvm/MC/MCAtom.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCDisassembler.h"
-#include "llvm/MC/MCFunction.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
 #undef NO
 #include "llvm/MC/MCInstrAnalysis.h"
 #define NO (BOOL)0
 #include "llvm/MC/MCInstrInfo.h"
-#include "llvm/MC/MCModule.h"
 #include "llvm/MC/MCObjectDisassembler.h"
 #include "llvm/MC/MCObjectFileInfo.h"
-#include "llvm/MC/MCObjectSymbolizer.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCRelocationInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
@@ -32,13 +28,14 @@ using namespace llvm;
 
 
 static const Target *target;
-static OwningPtr<const MCRegisterInfo> mri;
-static OwningPtr<const MCAsmInfo> asmInfo;
-static OwningPtr<const MCSubtargetInfo> sti;
-static OwningPtr<const MCInstrInfo> mii;
-static OwningPtr<const MCInstrAnalysis> mia;
-static OwningPtr<MCDisassembler> disAsm;
-static OwningPtr<MCInstPrinter> instrPrinter;
+static std::unique_ptr<MCContext> mccontext;
+static std::unique_ptr<const MCRegisterInfo> mri;
+static std::unique_ptr<const MCAsmInfo> asmInfo;
+static std::unique_ptr<const MCSubtargetInfo> sti;
+static std::unique_ptr<const MCInstrInfo> mii;
+static std::unique_ptr<const MCInstrAnalysis> mia;
+static std::unique_ptr<MCDisassembler> disAsm;
+static std::unique_ptr<MCInstPrinter> instrPrinter;
 
 namespace llvm {
 	extern const MCInstrDesc MipsInsts[];
@@ -91,16 +88,10 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 	MCInst inst;
 	if (disassembleInstruction(anInstruction, inst) == MCDisassembler::Success)
 	{
-		// FIXME: Works around a bug in LLVM.
-		if (inst.getOpcode() != 1051 &&
-            inst.getOpcode() != 1148 &&
-		    inst.getOpcode() != 1098)
-		{
-			std::string buffer;
-			raw_string_ostream os(buffer);
-			instrPrinter->printInst(&inst, os, "");
-			return [NSString stringWithUTF8String: os.str().c_str()];
-		}
+		std::string buffer;
+		raw_string_ostream os(buffer);
+		instrPrinter->printInst(&inst, os, "");
+		return [NSString stringWithUTF8String: os.str().c_str()];
 	}
 	return @"<Unable to disassemble>";
 }
@@ -184,10 +175,10 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 }
 + (void)initialize
 {
-	InitializeAllTargetInfos();
-	InitializeAllTargetMCs();
-	InitializeAllAsmParsers();
-	InitializeAllDisassemblers();
+	LLVMInitializeMipsTargetInfo();
+	LLVMInitializeMipsTargetMC();
+	LLVMInitializeMipsAsmParser();
+	LLVMInitializeMipsDisassembler();
 	std::string cheriTriple("cheri-unknown-freebsd");
 	std::string mipsTriple("mips64-unknown-freebsd");
 	std::string triple = cheriTriple;
@@ -210,20 +201,20 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 	}
 	NSLog(@"Using triple %s", triple.c_str());
 	mri.reset(MRI);
-	NSAssert(mri.isValid(), @"Failed to create MCRegisterInfo");
+	NSAssert(mri, @"Failed to create MCRegisterInfo");
 	asmInfo.reset(target->createMCAsmInfo(*mri, triple));
-	NSAssert(asmInfo.isValid(), @"Failed to create MCAsmInfo");
+	NSAssert(asmInfo, @"Failed to create MCAsmInfo");
 	sti.reset(target->createMCSubtargetInfo(triple, "", features));
-	NSAssert(sti.isValid(), @"Failed to create MCSubtargetInfo");
+	NSAssert(sti, @"Failed to create MCSubtargetInfo");
 	mii.reset(target->createMCInstrInfo());
-	NSAssert(mii.isValid(), @"Failed to create MCInstrInfo");
-	//mia.reset(target->createMCInstrAnalysis(mii.get()));
+	NSAssert(mii, @"Failed to create MCInstrInfo");
 	mia.reset(new MCInstrAnalysis(mii.get()));
-	NSAssert(mia.isValid(), @"Failed to create MCInstrAnalysis");
-	disAsm.reset(target->createMCDisassembler(*sti));
-	NSAssert(disAsm.isValid(), @"Failed to create MCDisassembler");
+	NSAssert(mia, @"Failed to create MCInstrAnalysis");
+	mccontext.reset(new MCContext(asmInfo.get(), mri.get(), nullptr));
+	disAsm.reset(target->createMCDisassembler(*sti, *mccontext));
+	NSAssert(disAsm, @"Failed to create MCDisassembler");
 	instrPrinter.reset(target->createMCInstPrinter(
         asmInfo->getAssemblerDialect(), *asmInfo, *mii, *mri, *sti));
-	NSAssert(instrPrinter.isValid(), @"Failed to create MCInstPrinter");
+	NSAssert(instrPrinter, @"Failed to create MCInstPrinter");
 }
 @end

@@ -5,20 +5,16 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/StringRefMemoryObject.h"
 #include "llvm/MC/MCAsmInfo.h"
-#include "llvm/MC/MCAtom.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCDisassembler.h"
-#include "llvm/MC/MCFunction.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
 #undef NO
 #include "llvm/MC/MCInstrAnalysis.h"
 #define NO (BOOL)0
 #include "llvm/MC/MCInstrInfo.h"
-#include "llvm/MC/MCModule.h"
 #include "llvm/MC/MCObjectDisassembler.h"
 #include "llvm/MC/MCObjectFileInfo.h"
-#include "llvm/MC/MCObjectSymbolizer.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCRelocationInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
@@ -59,9 +55,8 @@ namespace llvm {
 template<typename T>
 bool findAddress(T &si, T &&se, uint64_t anAddress)
 {
-	error_code ec;
-	for ( ; si != se; si.increment(ec)) {
-		DebugLogErrorCode(ec, return false;);
+	std::error_code ec;
+	for ( ; si != se; ++si) {
 		uint64_t start, size;
 		ec = si->getAddress(start);
 		DebugLogErrorCode(ec, return false);
@@ -76,16 +71,16 @@ bool findAddress(T &si, T &&se, uint64_t anAddress)
 	return false;
 }
 
-error_code getContents(section_iterator si, StringRef &data)
+std::error_code getContents(section_iterator si, StringRef &data)
 {
 	return si->getContents(data);
 }
 
-error_code getContents(symbol_iterator si, StringRef &data)
+std::error_code getContents(symbol_iterator si, StringRef &data)
 {
 	section_iterator sec((SectionRef()));
 	uint64_t start, secStart, size;
-	error_code ec = si->getSection(sec);
+	std::error_code ec = si->getSection(sec);
 	ec = sec->getContents(data);
 	if (ec)  { return ec; }
 	ec = sec->getAddress(secStart);
@@ -105,7 +100,7 @@ bool extractSymbolInfo(T &si,
                       StringRef &data,
                       uint64_t &baseAddress)
 {
-	error_code ec = si->getAddress(baseAddress);
+	std::error_code ec = si->getAddress(baseAddress);
 	DebugLogErrorCode(ec, return false);
 	ec = getContents(si, data);
 	DebugLogErrorCode(ec, return false);
@@ -206,13 +201,13 @@ bool extractSymbolInfo(T &si,
 
 @implementation CVObjectFile
 {
+	OwningBinary<ObjectFile> objectFileHolder;
 	ObjectFile *objectFile;
 	DIContext *debugInfo;
 }
 - (void)dealloc
 {
 	delete debugInfo;
-	delete objectFile;
 }
 + (CVObjectFile*)objectFileForFilePath: (NSString*)aPath
 {
@@ -220,39 +215,39 @@ bool extractSymbolInfo(T &si,
 }
 - (id)initWithPath: (NSString*)aPath
 {
-	objectFile = ObjectFile::createObjectFile([aPath UTF8String]);
-	if (objectFile == 0)
+	auto of = ObjectFile::createObjectFile([aPath UTF8String]);
+	if (!of)
 	{
+		NSLog(@"Failed to create object file: %s", of.getError().message().c_str());
 		return nil;
 	}
-	debugInfo = DIContext::getDWARFContext(objectFile);
+	objectFileHolder = std::move(of.get());
+	objectFile = objectFileHolder.getBinary().get();
+	debugInfo = DIContext::getDWARFContext(*objectFile);
 	return self;
 }
 - (CVFunction*)functionForAddress: (uint64_t)anAddress
 {
 	if (debugInfo != 0)
 	{
-		DILineInfo line = debugInfo->getLineInfoForAddress(anAddress, DILineInfoSpecifier(1+2+4));
+		//DILineInfo line = debugInfo->getLineInfoForAddress(anAddress, DILineInfoSpecifier(1+2+4));
 		//NSLog(@"File: %s function: %s line: %d", line.getFileName(), line.getFunctionName(), (int)line.getLine());
 	}
 	// This could be sped up with some caching, but it's probably not worth
 	// implementing it here, when the MCModule stuff will do a better job when
 	// it's finished.
-	error_code ec;
-	symbol_iterator si = objectFile->begin_symbols();
-	symbol_iterator dsi = objectFile->begin_dynamic_symbols();
-	section_iterator seci = objectFile->begin_sections();
+	std::error_code ec;
+	auto sections = objectFile->sections();
+	auto symbols = objectFile->symbols();
+	symbol_iterator si = symbols.begin();
+	section_iterator seci = sections.begin();
 	StringRef name, data;
 	uint64_t baseAddress;
-	if (findAddress(si, objectFile->end_symbols(), anAddress))
+	if (findAddress(si, symbols.end(), anAddress))
 	{
 		extractSymbolInfo(si, name, data, baseAddress);
 	}
-	else if (findAddress(dsi, objectFile->end_dynamic_symbols(), anAddress))
-	{
-		extractSymbolInfo(dsi, name, data, baseAddress);
-	}
-	else if (findAddress(seci, objectFile->end_sections(), anAddress))
+	else if (findAddress(seci, sections.end(), anAddress))
 	{
 		extractSymbolInfo(seci, name, data, baseAddress);
 	}
