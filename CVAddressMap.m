@@ -49,8 +49,7 @@
 	{
 		if ([line length] == 0) { continue; }
 		NSArray *matches = [re matchesInString: line options: NSMatchingAnchored range: NSMakeRange(0, [line length])];
-		NSTextCheckingResult *match = [matches objectAtIndex:0];
-		if (match == nil)
+		if ([matches count] != 1)
 		{
 			NSLog(@"Failed to parse procstat line:\n%@", line);
 			continue;
