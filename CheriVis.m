@@ -139,6 +139,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	 */
 	IBOutlet __unsafe_unretained NSButton *searchDisassembly;
 	/**
+	 * Checkbox indicating whether searches should search indexes.
+	 */
+	IBOutlet __unsafe_unretained NSButton *searchIndexes;
+	/**
 	 * Checkbox indicating whether searches should search program counter
 	 * addresses.
 	 */
@@ -288,11 +292,15 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		return;
 	}
+	BOOL idxs = [searchIndexes state] == NSOnState;
 	BOOL addrs = [searchAddresses state] == NSOnState;
 	BOOL instrs = [searchInstructions state] == NSOnState;
 	BOOL disasm = [searchDisassembly state] == NSOnState;
 	BOOL regs = [searchRegisterValues state] == NSOnState;
 	BOOL isRegex = [regexSearch state] == NSOnState;
+	BOOL showKern = [showKernel state] == NSOnState;
+	BOOL showUser = [showUserspace state] == NSOnState;
+
 	id search = [searchText stringValue];
 	NSInteger foundReg = NSNotFound;
 	// If the string is supposed to be a regular expression, parse it and
@@ -331,6 +339,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 			i = [streamTrace userspaceTraceEntryAtIndex: i];
 		}
 		[streamTrace setStateToIndex: i];
+		if (idxs)
+		{
+			NSString *str = [NSString stringWithFormat: @"%d" PRIx64, i];
+			if (matchStringOrRegex(str, search, isRegex))
+			{
+				break;
+			}
+		}
 		if (addrs)
 		{
 			NSString *str = [NSString stringWithFormat: @"0x%.16" PRIx64, [streamTrace programCounter]];
