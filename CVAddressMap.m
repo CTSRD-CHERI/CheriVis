@@ -27,7 +27,10 @@
 	if ([lines count] < 2) { return nil; }
 
 	// Ignore the header line
-	lines = [lines subarrayWithRange: NSMakeRange(1, [lines count]-1)];
+	if ([[lines objectAtIndex: 0] rangeOfString: @"  PID"].location == 0)
+	{
+		lines = [lines subarrayWithRange: NSMakeRange(1, [lines count]-1)];
+	}
 	addresses = calloc([lines count], sizeof(CVAddressRange));
 	files = [NSMutableArray new];
 	CVAddressRange *ar = addresses;
