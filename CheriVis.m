@@ -345,7 +345,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		[self setTraceToRow: i];
 		if (idxs)
 		{
-			NSString *str = [NSString stringWithFormat: @"%d" PRIx64, i];
+			NSString *str = [NSString stringWithFormat: @"%ld", (long)i];
 			if (matchStringOrRegex(str, search, isRegex))
 			{
 				break;
