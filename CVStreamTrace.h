@@ -74,6 +74,10 @@
  */
 - (uint64_t)programCounter;
 /**
+ * Returns the number of cycles in the current trace before the current instruction.
+ */
+- (uint64_t)cycleCount;
+/**
  * Returns the type of the instruction at the current index in the stream.
  */
 - (CVInstructionType)instructionType;

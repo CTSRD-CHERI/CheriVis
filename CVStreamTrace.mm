@@ -31,13 +31,13 @@ struct cheri_debug_trace_entry_disk {
 
 struct RegisterState
 {
-	uint16_t cycle_count;
+	uint8_t  exception;
 	uint16_t deadCycles;
 	uint32_t instr;
-	uint8_t  exception;
+	uint32_t validRegisters;
 	CVInstructionType instructionType;
 	uint64_t pc;
-	uint32_t validRegisters;
+	uint64_t cycleCount;
 	uint64_t registers[32];
 	// TODO: Capability registers
 	// TODO: FPU registers
@@ -103,6 +103,7 @@ static BOOL isKernelAddress(uint64_t anAddress)
 	length = std::min((long long)[aTrace length] / 32, CacheSize);
 	start = anIndex;
 	struct RegisterState *ors = &initialRegisterSet;
+	uint16_t lastCycleCount = 0;
 
 	for (NSInteger i=anIndex ; i<(anIndex+length) ; i++)
 	{
@@ -113,15 +114,24 @@ static BOOL isKernelAddress(uint64_t anAddress)
 		struct RegisterState *rs = &registers[i-start];
 		*rs = *ors;
 		rs->pc = NSSwapBigLongLongToHost(traceEntry.pc);
-		rs->cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
-		if (rs->cycle_count < ors->cycle_count)
+		uint16_t cycleCount = NSSwapBigShortToHost(traceEntry.cycles);
+		if (cycleCount < lastCycleCount)
 		{
-			rs->deadCycles = rs->cycle_count + 1023 - ors->cycle_count;
+			rs->deadCycles = cycleCount + 1023 - lastCycleCount;
+		}
+		else if (cycleCount == lastCycleCount)
+		{
+			rs->deadCycles = 0;
 		}
 		else
 		{
-			rs->deadCycles = (rs->cycle_count - ors->cycle_count) - 1;
+			rs->deadCycles = (cycleCount - lastCycleCount) - 1;
 		}
+		if (cycleCount > lastCycleCount)
+		{
+			rs->cycleCount = ors->cycleCount + 1 + rs->deadCycles;
+		}
+		assert(rs->deadCycles < 1024);
 		rs->exception = traceEntry.exception;
 		rs->instr = traceEntry.inst;
 		if (traceEntry.version == 1 || traceEntry.version == 2)
@@ -134,6 +144,7 @@ static BOOL isKernelAddress(uint64_t anAddress)
 			}
 		}
 		ors = rs;
+		lastCycleCount = cycleCount;
 	}
 	return self;
 }
@@ -242,7 +253,6 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 				[aTrace getBytes: &traceEntry
 				           range: NSMakeRange(i*32, 32)];
 				rs.pc = NSSwapBigLongLongToHost(traceEntry.pc);
-				rs.cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
 				rs.exception = traceEntry.exception;
 				rs.instr = traceEntry.inst;
 				if (isKernelAddress(rs.pc) != lastWasKernel)
@@ -411,6 +421,10 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 - (NSUInteger)deadCycles
 {
 	return currentState.deadCycles;
+}
+- (uint64_t)cycleCount
+{
+	return currentState.cycleCount;
 }
 - (NSString*)notes
 {
