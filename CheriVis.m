@@ -250,6 +250,20 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	}
 	[mainWindow setTitle: title];
 }
+- (void)setTraceToRow: (NSUInteger)aRow
+{
+	BOOL showKern = [showKernel state] == NSOnState;
+	BOOL showUser = [showUserspace state] == NSOnState;
+	if (showKern && !showUser)
+	{
+		aRow = [streamTrace kernelTraceEntryAtIndex: aRow];
+	}
+	else if (showUser && !showKern)
+	{
+		aRow = [streamTrace userspaceTraceEntryAtIndex: aRow];
+	}
+	[streamTrace setStateToIndex: aRow];
+}
 - (void)defaultsDidChange: (NSNotification*)aNotification
 {
 	// We could check if the defaults that have changed are related to this,
@@ -298,8 +312,6 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	BOOL disasm = [searchDisassembly state] == NSOnState;
 	BOOL regs = [searchRegisterValues state] == NSOnState;
 	BOOL isRegex = [regexSearch state] == NSOnState;
-	BOOL showKern = [showKernel state] == NSOnState;
-	BOOL showUser = [showUserspace state] == NSOnState;
 
 	id search = [searchText stringValue];
 	NSInteger foundReg = NSNotFound;
@@ -330,15 +342,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		{
 			i = wrap - 1;
 		}
-		if (showKern && !showUser)
-		{
-			i = [streamTrace kernelTraceEntryAtIndex: i];
-		}
-		else if (showUser && !showKern)
-		{
-			i = [streamTrace userspaceTraceEntryAtIndex: i];
-		}
-		[streamTrace setStateToIndex: i];
+		[self setTraceToRow: i];
 		if (idxs)
 		{
 			NSString *str = [NSString stringWithFormat: @"%d" PRIx64, i];
@@ -493,17 +497,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	NSString *columnId = [aTableColumn identifier];
 	if (aTableView == traceView)
 	{
-		BOOL showKern = [showKernel state] == NSOnState;
-		BOOL showUser = [showUserspace state] == NSOnState;
-		if (showKern && !showUser)
-		{
-			rowIndex = [streamTrace kernelTraceEntryAtIndex: rowIndex];
-		}
-		else if (showUser && !showKern)
-		{
-			rowIndex = [streamTrace userspaceTraceEntryAtIndex: rowIndex];
-		}
-		[streamTrace setStateToIndex: rowIndex];
+		[self setTraceToRow: rowIndex];
 		if ([@"pc" isEqualToString: columnId])
 		{
 			NSColor *textColor = [streamTrace isKernel] ?
