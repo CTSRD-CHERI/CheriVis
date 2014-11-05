@@ -169,6 +169,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	 */
 	IBOutlet __unsafe_unretained NSButton *showUserspace;
 	/**
+	 * The status bar along the bottom of the window.
+	 */
+	IBOutlet __unsafe_unretained NSTextField *statusBar;
+	/**
 	 * The controller for the call graph view.
 	 */
 	IBOutlet __unsafe_unretained CVCallGraph *callGraph;
@@ -216,6 +220,12 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	messages = [NSMutableDictionary new];
 
 	objectFiles = [NSMutableDictionary new];
+
+	[[NSNotificationCenter defaultCenter]
+	    addObserver: self
+	       selector: @selector(selectionDidChange:)
+	           name: NSTableViewSelectionDidChangeNotification
+	         object: traceView];
 
 	[[NSNotificationCenter defaultCenter]
 	    addObserver: self
@@ -284,6 +294,25 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		[traceView reloadData];
 	}
 	lastLoaded = loaded;
+}
+- (void)selectionDidChange: (NSNotification*)aNotification
+{
+	NSIndexSet *indexes = [traceView selectedRowIndexes];
+	NSUInteger first = [indexes firstIndex];
+	NSUInteger last = [indexes lastIndex]+1;
+	NSUInteger count = [indexes count];
+	if (last - first != count)
+	{
+		[statusBar setStringValue: [NSString stringWithFormat: @"Selected %ld rows", count]];
+		return;
+	}
+
+	[self setTraceToRow: last];
+	uint64_t cycles = [streamTrace cycleCount];
+	[self setTraceToRow: first];
+	cycles -= [streamTrace cycleCount];
+
+	[statusBar setStringValue: [NSString stringWithFormat: @"Selected %ld rows, %" PRId64 " cycles", count, cycles]];
 }
 - (void)selectRange: (NSNotification*)aNotification
 {
