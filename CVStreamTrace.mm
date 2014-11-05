@@ -116,7 +116,7 @@ static BOOL isKernelAddress(uint64_t anAddress)
 		rs->cycle_count = NSSwapBigShortToHost(traceEntry.cycles);
 		if (rs->cycle_count < ors->cycle_count)
 		{
-			rs->deadCycles = (rs->cycle_count - ors->cycle_count) + 1023;
+			rs->deadCycles = rs->cycle_count + 1023 - ors->cycle_count;
 		}
 		else
 		{
