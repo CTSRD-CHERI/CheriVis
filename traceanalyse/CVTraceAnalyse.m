@@ -19,6 +19,10 @@ static void usage()
 	const char *progName = [[[NSProcessInfo processInfo] processName] UTF8String];
 	fprintf(stderr, "Usage: %s {arguments}\n\nArguments:\n", progName);
 	fprintf(stderr, "\t-traceFile {filename}\t\tThe name of the trace file to process\n");
+	fprintf(stderr, "\t-start {index}\t\tThe start index in the trace to process\n");
+	fprintf(stderr, "\t-end {index}\t\tThe end index in the trace to process\n");
+	fprintf(stderr, "\t-startPC {address}\t\tIgnore all of the trace before this PC is reached\n");
+	fprintf(stderr, "\t-endPC {address}\t\tIgnore all of the trace after this PC is reached\n");
 	exit(EXIT_FAILURE);
 }
 
