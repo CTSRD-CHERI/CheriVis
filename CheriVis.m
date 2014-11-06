@@ -465,8 +465,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		NSData *traceData = [NSData dataWithContentsOfMappedFile: file];
 		NSString *notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
+		NSError *error = nil;
 		streamTrace = [[CVStreamTrace alloc] initWithTraceData: traceData
-		                                         notesFileName: notesFile];
+		                                         notesFileName: notesFile
+														 error: &error];
+		if (error)
+		{
+			[NSApp presentError: error];
+		}
 		[traceView reloadData];
 		integerRegisterNames = [streamTrace integerRegisterNames];
 		traceDirectory = [file stringByDeletingLastPathComponent];
@@ -598,7 +604,13 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		return;
 	}
 	[streamTrace setStateToIndex: rowIndex];
-	[streamTrace setNotes: [anObject description]];
+	NSError *error = nil;
+	[streamTrace setNotes: [anObject description] error: &error];
+	if (error)
+	{
+		[NSApp presentError: error];
+	}
+
 }
 - (CVFunction*)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
 {

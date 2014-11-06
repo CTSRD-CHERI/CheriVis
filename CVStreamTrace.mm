@@ -230,7 +230,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 		[userspaceRanges addIndexesInRange: aRange];
 	}
 }
-- (id)initWithTraceData: (NSData*)aTrace notesFileName: (NSString*)aString
+- (id)initWithTraceData: (NSData*)aTrace notesFileName: (NSString*)aString error: (NSError **)error
 {
 	if (nil == (self = [super init])) { return nil; }
 	trace = aTrace;
@@ -286,15 +286,10 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	notesFileName = aString;
 	if ([[NSFileManager defaultManager] fileExistsAtPath: aString])
 	{
-		NSError *error;
 		notes =
 		    [NSJSONSerialization JSONObjectWithData: [NSData dataWithContentsOfFile: aString]
 			                                options: NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-		                                      error: &error];
-		if (error)
-		{
-			[NSApp presentError: error];
-		}
+		                                      error: error];
 	}
 	else
 	{
@@ -431,18 +426,16 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	NSString *key = [NSString stringWithFormat: @"%lld", (long long)currentIndex];
 	return [notes objectForKey: key];
 }
-- (void)setNotes: (NSString*)aString
+- (void)setNotes: (NSString*)aString error: (NSError **)error
 {
 	NSString *key = [NSString stringWithFormat: @"%lld", (long long)currentIndex];
 	[notes setObject: aString forKey: key];
-	NSError *error;
 	NSLog(@"Notes: %@", notes);
 	NSData *json = [NSJSONSerialization dataWithJSONObject: notes
 												   options: NSJSONWritingPrettyPrinted
-													 error: &error];
-	if (error)
+													 error: error];
+	if (*error)
 	{
-		[NSApp presentError:error];
 		return;
 	}
 	[json writeToFile: notesFileName atomically: YES];

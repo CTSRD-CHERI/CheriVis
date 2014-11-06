@@ -13,7 +13,7 @@
  *
  * The file name is where annotations will be loaded from and stored.
  */
-- (id)initWithTraceData: (NSData*)aTrace notesFileName: (NSString*)aString;
+- (id)initWithTraceData: (NSData*)aTrace notesFileName: (NSString*)aString error: (NSError **)error;
 /**
  * Sets the index of the stream trace object to a specified offset into the
  * stream.  Stateful accessor methods use this index.  Returns YES if passed a
@@ -99,7 +99,7 @@
 /**
  * Associate notes with this entry.
  */
-- (void)setNotes: (NSString*)aString;
+- (void)setNotes: (NSString*)aString error: (NSError **)error;
 @end
 
 extern NSString *CVStreamTraceLoadedEntriesNotification;
