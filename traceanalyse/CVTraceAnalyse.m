@@ -92,6 +92,11 @@ static void reportErrorIf(NSString *context, NSError *error)
 	for (NSInteger i=start ; i<end ; i++)
 	{
 		[trace setStateToIndex: i];
+		// Sometimes we end up with a 0 entry at the start of the streamtrace.  If so, skip it.
+		if ([trace programCounter] == 0)
+		{
+			continue;
+		}
 		if (log == NO)
 		{
 			if ([trace programCounter] != startPC)
