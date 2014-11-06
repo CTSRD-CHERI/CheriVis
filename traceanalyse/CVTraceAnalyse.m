@@ -2,6 +2,18 @@
 #import "CVStreamTrace.h"
 #import "CVAddressMap.h"
 
+struct TraceStats
+{
+	long interrupt;
+	long tlbModify;
+	long tlbLoad;
+	long tlbStore;
+	long sysCall;
+	long otherException;
+	long userCycles;
+	long kernelCycles;
+};
+
 static void usage()
 {
 	const char *progName = [[[NSProcessInfo processInfo] processName] UTF8String];
@@ -40,56 +52,90 @@ static void reportErrorIf(NSString *context, NSError *error)
 		[self processTrace];
 	}
 }
+- (void)printStats: (struct TraceStats)stats
+{
+	printf("%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\n",
+		   stats.interrupt,
+		   stats.tlbModify,
+		   stats.tlbLoad,
+		   stats.tlbStore,
+		   stats.sysCall,
+		   stats.otherException,
+		   stats.userCycles,
+		   stats.kernelCycles);
+}
 - (void)processTrace
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	NSInteger start = [defaults integerForKey: @"start"];
 	NSInteger end = [defaults integerForKey: @"end"];
+	uint64_t startPC = [defaults integerForKey: @"startPC"];
+	uint64_t endPC = [defaults integerForKey: @"endPC"];
 	if (end == 0)
 	{
 		end = [trace numberOfTraceEntries];
 	}
+	BOOL log = NO;
+	if (startPC == 0)
+	{
+		log = YES;
+	}
 	NSLog(@"%ld - %ld", start, end);
-	long interrupt = 0;
-	long tlbModify = 0;
-	long tlbLoad = 0;
-	long tlbStore = 0;
-	long sysCall = 0;
-	long otherException = 0;
-	long userCycles = 0;
-	long kernelCycles = 0;
+	struct TraceStats s;
+	bzero(&s, sizeof(s));
+	printf("Interrupts\tTLB_Modify\tTLB_Load\tTLB_Store\tSyscall\tOther Exceptions\tUserspace Cycles\tKernel Cycles\n");
 
 	for (NSInteger i=start ; i<end ; i++)
 	{
 		[trace setStateToIndex: i];
+		if (log == NO)
+		{
+			if ([trace programCounter] != startPC)
+			{
+				continue;
+			}
+			log = YES;
+		}
+		else
+		{
+			if (endPC == [trace programCounter])
+			{
+				log = NO;
+				[self printStats: s];
+				bzero(&s, sizeof(s));
+				continue;
+			}
+		}
 
 		switch ([trace exception])
 		{
 			case 0:
-				interrupt++;
+				s.interrupt++;
 				break;
 			case 1:
-				tlbModify++;
+				s.tlbModify++;
 				break;
 			case 2:
-				tlbLoad++;
+				s.tlbLoad++;
 				break;
 			case 3:
-				tlbStore++;
+				s.tlbStore++;
 				break;
 			case 8:
-				sysCall++;
+				s.sysCall++;
 				break;
 			case 31:
 				break;
 			default:
-				otherException++;
+				s.otherException++;
 		}
-		long *cycles = [trace isKernel] ? &kernelCycles : &userCycles;
+		long *cycles = [trace isKernel] ? &s.kernelCycles : &s.userCycles;
 		*cycles += [trace deadCycles] + 1;
 	}
-	printf("Interrupts\tTLB_Modify\tTLB_Load\tTLB_Store\tSyscall\tOther Exceptions\tUserspace Cycles\tKernel Cycles\n");
-	printf("%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\n", interrupt, tlbModify, tlbLoad, tlbStore, sysCall, otherException, userCycles, kernelCycles);
+	if (log)
+	{
+		[self printStats: s];
+	}
 	exit(EXIT_SUCCESS);
 }
 - (void)run
