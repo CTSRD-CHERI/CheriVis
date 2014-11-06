@@ -16,6 +16,12 @@
 		28459D26188620EC00798DAC /* CVObjectFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1D188620EC00798DAC /* CVObjectFile.mm */; };
 		28459D27188620EC00798DAC /* CVStreamTrace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1F188620EC00798DAC /* CVStreamTrace.mm */; };
 		28459D291886225D00798DAC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D281886225D00798DAC /* main.m */; };
+		28D774FB1A0B79D50035F189 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D774FA1A0B79D50035F189 /* main.m */; };
+		28D774FF1A0B7BA00035F189 /* CVDisassembler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D19188620EC00798DAC /* CVDisassembler.mm */; };
+		28D775001A0B7BA00035F189 /* CVObjectFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1D188620EC00798DAC /* CVObjectFile.mm */; };
+		28D775011A0B7BA00035F189 /* CVStreamTrace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1F188620EC00798DAC /* CVStreamTrace.mm */; };
+		28D775041A0B85A90035F189 /* CVTraceAnalyse.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D775031A0B85A90035F189 /* CVTraceAnalyse.m */; };
+		28D775051A0B8A860035F189 /* CVAddressMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D13188620EC00798DAC /* CVAddressMap.m */; };
 		28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
 		28E5373118862022006FE3AE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28E5372F18862022006FE3AE /* InfoPlist.strings */; };
 		28E5373718862022006FE3AE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373518862022006FE3AE /* Credits.rtf */; };
@@ -34,6 +40,18 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		28D774F61A0B79D50035F189 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		28459D11188620EC00798DAC /* CheriVis.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheriVis.m; sourceTree = SOURCE_ROOT; };
 		28459D12188620EC00798DAC /* CVAddressMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVAddressMap.h; sourceTree = SOURCE_ROOT; };
@@ -51,6 +69,10 @@
 		28459D1E188620EC00798DAC /* CVStreamTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVStreamTrace.h; sourceTree = SOURCE_ROOT; };
 		28459D1F188620EC00798DAC /* CVStreamTrace.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVStreamTrace.mm; sourceTree = SOURCE_ROOT; };
 		28459D281886225D00798DAC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		28D774F81A0B79D50035F189 /* traceanalyse */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = traceanalyse; sourceTree = BUILT_PRODUCTS_DIR; };
+		28D774FA1A0B79D50035F189 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		28D775021A0B85A90035F189 /* CVTraceAnalyse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVTraceAnalyse.h; sourceTree = "<group>"; };
+		28D775031A0B85A90035F189 /* CVTraceAnalyse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVTraceAnalyse.m; sourceTree = "<group>"; };
 		28E5372318862022006FE3AE /* CheriVis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheriVis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		28E5372618862022006FE3AE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		28E5372918862022006FE3AE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -65,6 +87,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		28D774F51A0B79D50035F189 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28E5372018862022006FE3AE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -84,10 +113,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		28D774F91A0B79D50035F189 /* traceanalyse */ = {
+			isa = PBXGroup;
+			children = (
+				28D774FA1A0B79D50035F189 /* main.m */,
+				28D775021A0B85A90035F189 /* CVTraceAnalyse.h */,
+				28D775031A0B85A90035F189 /* CVTraceAnalyse.m */,
+			);
+			path = traceanalyse;
+			sourceTree = "<group>";
+		};
 		28E5371A18862022006FE3AE = {
 			isa = PBXGroup;
 			children = (
 				28E5372C18862022006FE3AE /* CheriVis */,
+				28D774F91A0B79D50035F189 /* traceanalyse */,
 				28E5372518862022006FE3AE /* Frameworks */,
 				28E5372418862022006FE3AE /* Products */,
 			);
@@ -98,6 +138,7 @@
 			children = (
 				28E5372318862022006FE3AE /* CheriVis.app */,
 				28E5374418862022006FE3AE /* CheriVisTests.xctest */,
+				28D774F81A0B79D50035F189 /* traceanalyse */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,6 +201,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		28D774F71A0B79D50035F189 /* traceanalyse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28D774FE1A0B79D50035F189 /* Build configuration list for PBXNativeTarget "traceanalyse" */;
+			buildPhases = (
+				28D774F41A0B79D50035F189 /* Sources */,
+				28D774F51A0B79D50035F189 /* Frameworks */,
+				28D774F61A0B79D50035F189 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = traceanalyse;
+			productName = traceanalyse;
+			productReference = 28D774F81A0B79D50035F189 /* traceanalyse */;
+			productType = "com.apple.product-type.tool";
+		};
 		28E5372218862022006FE3AE /* CheriVis */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 28E5375418862022006FE3AE /* Build configuration list for PBXNativeTarget "CheriVis" */;
@@ -205,6 +263,9 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "David Chisnall";
 				TargetAttributes = {
+					28D774F71A0B79D50035F189 = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
 					28E5374318862022006FE3AE = {
 						TestTargetID = 28E5372218862022006FE3AE;
 					};
@@ -225,6 +286,7 @@
 			targets = (
 				28E5372218862022006FE3AE /* CheriVis */,
 				28E5374318862022006FE3AE /* CheriVisTests */,
+				28D774F71A0B79D50035F189 /* traceanalyse */,
 			);
 		};
 /* End PBXProject section */
@@ -251,6 +313,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		28D774F41A0B79D50035F189 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28D775011A0B7BA00035F189 /* CVStreamTrace.mm in Sources */,
+				28D775041A0B85A90035F189 /* CVTraceAnalyse.m in Sources */,
+				28D775001A0B7BA00035F189 /* CVObjectFile.mm in Sources */,
+				28D774FF1A0B7BA00035F189 /* CVDisassembler.mm in Sources */,
+				28D775051A0B8A860035F189 /* CVAddressMap.m in Sources */,
+				28D774FB1A0B79D50035F189 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28E5371F18862022006FE3AE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -312,6 +387,182 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		28D774FC1A0B79D50035F189 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = (
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Release/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Release/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/theraven/Documents/Research/cheri/llvm/Build/lib",
+					"-lcurses",
+					"-lpthread",
+					"-lz",
+					"-lLLVMDebugInfo",
+					"-lLLVMObject",
+					"-lLLVMBitReader",
+					"-lLLVMMipsDisassembler",
+					"-lLLVMMCDisassembler",
+					"-lLLVMMipsAsmParser",
+					"-lLLVMMipsCodeGen",
+					"-lLLVMSelectionDAG",
+					"-lLLVMAsmPrinter",
+					"-lLLVMMCParser",
+					"-lLLVMCodeGen",
+					"-lLLVMScalarOpts",
+					"-lLLVMInstCombine",
+					"-lLLVMTransformUtils",
+					"-lLLVMipa",
+					"-lLLVMAnalysis",
+					"-lLLVMTarget",
+					"-lLLVMCore",
+					"-lLLVMMipsDesc",
+					"-lLLVMMipsInfo",
+					"-lLLVMMipsAsmPrinter",
+					"-lLLVMMC",
+					"-lLLVMSupport",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		28D774FD1A0B79D50035F189 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Release/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
+					"-I/Users/theraven/Documents/Research/cheri/llvm/Release/include",
+					"-fPIC",
+					"-fvisibility-inlines-hidden",
+					"-Wall",
+					"-W",
+					"-Wno-unused-parameter",
+					"-Wwrite-strings",
+					"-Wmissing-field-initializers",
+					"-pedantic",
+					"-Wno-long-long",
+					"-Wcovered-switch-default",
+					"-Wnon-virtual-dtor",
+					"-fcolor-diagnostics",
+					"-g",
+					"-stdlib=libc++",
+					"-UNDEBUG",
+					"-D__STDC_CONSTANT_MACROS",
+					"-D__STDC_FORMAT_MACROS",
+					"-D__STDC_LIMIT_MACROS",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/theraven/Documents/Research/cheri/llvm/Release/lib",
+					"-lcurses",
+					"-lpthread",
+					"-lz",
+					"-lLLVMDebugInfo",
+					"-lLLVMObject",
+					"-lLLVMBitReader",
+					"-lLLVMMipsDisassembler",
+					"-lLLVMMCDisassembler",
+					"-lLLVMMipsAsmParser",
+					"-lLLVMMipsCodeGen",
+					"-lLLVMSelectionDAG",
+					"-lLLVMAsmPrinter",
+					"-lLLVMMCParser",
+					"-lLLVMCodeGen",
+					"-lLLVMScalarOpts",
+					"-lLLVMInstCombine",
+					"-lLLVMTransformUtils",
+					"-lLLVMipa",
+					"-lLLVMAnalysis",
+					"-lLLVMTarget",
+					"-lLLVMCore",
+					"-lLLVMMipsDesc",
+					"-lLLVMMipsInfo",
+					"-lLLVMMipsAsmPrinter",
+					"-lLLVMMC",
+					"-lLLVMSupport",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		28E5375218862022006FE3AE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -601,6 +852,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		28D774FE1A0B79D50035F189 /* Build configuration list for PBXNativeTarget "traceanalyse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				28D774FC1A0B79D50035F189 /* Debug */,
+				28D774FD1A0B79D50035F189 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		28E5371E18862022006FE3AE /* Build configuration list for PBXProject "CheriVis" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
