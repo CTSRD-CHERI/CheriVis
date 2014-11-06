@@ -12,6 +12,8 @@ struct TraceStats
 	long otherException;
 	long userCycles;
 	long kernelCycles;
+	long userInstructions;
+	long kernelInstructions;
 };
 
 static void usage()
@@ -58,7 +60,7 @@ static void reportErrorIf(NSString *context, NSError *error)
 }
 - (void)printStats: (struct TraceStats)stats
 {
-	printf("%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\n",
+	printf("%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld\n",
 		   stats.interrupt,
 		   stats.tlbModify,
 		   stats.tlbLoad,
@@ -66,7 +68,9 @@ static void reportErrorIf(NSString *context, NSError *error)
 		   stats.sysCall,
 		   stats.otherException,
 		   stats.userCycles,
-		   stats.kernelCycles);
+		   stats.kernelCycles,
+		   stats.userInstructions,
+		   stats.kernelInstructions);
 }
 - (void)processTrace
 {
@@ -87,7 +91,7 @@ static void reportErrorIf(NSString *context, NSError *error)
 	NSLog(@"%ld - %ld", start, end);
 	struct TraceStats s;
 	bzero(&s, sizeof(s));
-	printf("Interrupts\tTLB_Modify\tTLB_Load\tTLB_Store\tSyscall\tOther Exceptions\tUserspace Cycles\tKernel Cycles\n");
+	printf("Interrupts\tTLB_Modify\tTLB_Load\tTLB_Store\tSyscall\tOther Exceptions\tUserspace Cycles\tKernel Cycles\tUserspace Instructions\tKernel Instructions\n");
 
 	for (NSInteger i=start ; i<end ; i++)
 	{
@@ -140,6 +144,8 @@ static void reportErrorIf(NSString *context, NSError *error)
 		}
 		long *cycles = [trace isKernel] ? &s.kernelCycles : &s.userCycles;
 		*cycles += [trace deadCycles] + 1;
+		long *instructions = [trace isKernel] ? &s.kernelInstructions : &s.userInstructions;
+		(*instructions)++;
 	}
 	if (log)
 	{
