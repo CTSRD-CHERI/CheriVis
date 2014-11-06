@@ -143,6 +143,12 @@ static BOOL isKernelAddress(uint64_t anAddress)
 				rs->registers[regNo] = NSSwapBigLongLongToHost(traceEntry.val2);
 			}
 		}
+		// Some entries in the streamtrace lack a program counter, because they include
+		// capability register information (which we are not currently parsing)
+		if (rs->pc == 0)
+		{
+			rs->pc = ors->pc+4;
+		}
 		ors = rs;
 		lastCycleCount = cycleCount;
 	}
