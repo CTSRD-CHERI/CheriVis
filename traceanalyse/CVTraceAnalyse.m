@@ -79,6 +79,7 @@ static void reportErrorIf(NSString *context, NSError *error)
 	NSInteger end = [defaults integerForKey: @"end"];
 	uint64_t startPC = [defaults integerForKey: @"startPC"];
 	uint64_t endPC = [defaults integerForKey: @"endPC"];
+	CVDisassembler *dis = [CVDisassembler new];
 	if (end == 0)
 	{
 		end = [trace numberOfTraceEntries];
@@ -92,6 +93,14 @@ static void reportErrorIf(NSString *context, NSError *error)
 	struct TraceStats s;
 	bzero(&s, sizeof(s));
 	printf("Interrupts\tTLB_Modify\tTLB_Load\tTLB_Store\tSyscall\tOther Exceptions\tUserspace Cycles\tKernel Cycles\tUserspace Instructions\tKernel Instructions\n");
+
+	BOOL isDelaySlot = NO;
+	BOOL isAfterBranch = NO;
+	long branches = 0;
+	long deadCyclesAfterBranches = 0;
+	long memOps = 0;
+	long deadCyclesAfterMemOps = 0;
+	BOOL isAfterMemOp = NO;
 
 	for (NSInteger i=start ; i<end ; i++)
 	{
@@ -108,6 +117,9 @@ static void reportErrorIf(NSString *context, NSError *error)
 				continue;
 			}
 			log = YES;
+			isDelaySlot = NO;
+			isAfterBranch = NO;
+
 		}
 		else
 		{
@@ -119,7 +131,6 @@ static void reportErrorIf(NSString *context, NSError *error)
 				continue;
 			}
 		}
-
 		switch ([trace exception])
 		{
 			case 0:
@@ -146,11 +157,54 @@ static void reportErrorIf(NSString *context, NSError *error)
 		*cycles += [trace deadCycles] + 1;
 		long *instructions = [trace isKernel] ? &s.kernelInstructions : &s.userInstructions;
 		(*instructions)++;
+		uint32_t instr = [trace encodedInstruction];
+		if ([dis typeOfInstruction: instr] == CVInstructionTypeFlowControl)
+		{
+			if ([dis hasDelaySlot: instr])
+			{
+				isDelaySlot = YES;
+				isAfterBranch = NO;
+			}
+			else
+			{
+				isDelaySlot = NO;
+				isAfterBranch = YES;
+			}
+		}
+		else
+		{
+			if (isDelaySlot)
+			{
+				isDelaySlot = NO;
+				isAfterBranch = YES;
+			}
+			else if (isAfterBranch)
+			{
+				branches++;
+				deadCyclesAfterBranches += [trace deadCycles];
+				isAfterBranch = NO;
+				isDelaySlot = NO;
+			}
+		}
+		if (isAfterMemOp)
+		{
+			isAfterMemOp = NO;
+			memOps++;
+			deadCyclesAfterMemOps += [trace deadCycles];
+		}
+		if ([dis typeOfInstruction: instr] == CVInstructionTypeMemory)
+		{
+			isAfterMemOp = YES;
+		}
 	}
 	if (log)
 	{
 		[self printStats: s];
 	}
+	NSLog(@"Branches: %ld", branches);
+	NSLog(@"Average dead cycles after a branch: %f", ((double)deadCyclesAfterBranches) / branches);
+	NSLog(@"Memory operations: %ld", memOps);
+	NSLog(@"Average dead cycles after a memory operations: %f", ((double)deadCyclesAfterMemOps) / memOps);
 	exit(EXIT_SUCCESS);
 }
 - (void)ignored {}
