@@ -182,7 +182,7 @@ NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 	[anInvocation retainArguments];
 	[anInvocation performSelectorOnMainThread: @selector(invokeWithTarget:)
 	                               withObject: receiver
-	                            waitUntilDone: NO];
+	                            waitUntilDone: YES];
 }
 @end
 @implementation NSObject (InMainThread)
