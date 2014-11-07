@@ -1,6 +1,9 @@
 #import <AppKit/NSTableView.h>
 
 @class CVFunction;
+#ifdef GNUSTEP
+@protocol NSTableViewDataSource;
+#endif
 
 /**
  * The CVDisassemblyController class is the controller for the disassembled

@@ -162,10 +162,19 @@ static void reportErrorIf(NSString *context, NSError *error)
 	{
 		usage();
 	}
+#ifdef GNUSTEP
+	NSData *traceData = [[NSData alloc] initWithContentsOfMappedFile: traceFile];
+	if (traceData == nil)
+	{
+		fprintf(stderr, "Error opening trace file\n");
+		exit(EXIT_FAILURE);
+	}
+#else
 	NSData *traceData = [[NSData alloc] initWithContentsOfFile: traceFile
 													   options: NSDataReadingMappedAlways
 														 error: &error];
 	reportErrorIf(@"opening trace file", error);
+#endif
 	trace = [[CVStreamTrace alloc] initWithTraceData: traceData
 									   notesFileName: nil
 											   error: &error];
