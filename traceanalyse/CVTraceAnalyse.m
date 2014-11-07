@@ -153,6 +153,7 @@ static void reportErrorIf(NSString *context, NSError *error)
 	}
 	exit(EXIT_SUCCESS);
 }
+- (void)ignored {}
 - (void)run
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -169,6 +170,13 @@ static void reportErrorIf(NSString *context, NSError *error)
 		fprintf(stderr, "Error opening trace file\n");
 		exit(EXIT_FAILURE);
 	}
+	// Force the run loop not to exit.  On GNUstep, the
+	// notification centre isn't enough to keep the run loop alive.
+	[NSTimer scheduledTimerWithTimeInterval: 100000
+									 target: self
+								   selector: @selector(hack)
+								   userInfo: nil
+									repeats: YES];
 #else
 	NSData *traceData = [[NSData alloc] initWithContentsOfFile: traceFile
 													   options: NSDataReadingMappedAlways
