@@ -41,6 +41,10 @@ typedef enum {
  * instruction, NO otherwise.
  */
 - (BOOL)isReturnInstruction: (uint32_t)anInstruction;
+/**
+ * Returns YES if the instruction has a delay slot, otherwise NO.
+ */
+- (BOOL)hasDelaySlot: (uint32_t)anInstruction;
 @end
 
 static const char* const MipsRegisterNames[] = {

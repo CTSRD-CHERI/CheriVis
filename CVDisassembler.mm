@@ -112,6 +112,17 @@ static MCDisassembler::DecodeStatus disassembleInstruction(uint32_t anInstructio
 	}
 	return CVInstructionTypeUnknown;
 }
+- (BOOL)hasDelaySlot: (uint32_t)anInstruction
+{
+	MCInst inst;
+	if (disassembleInstruction(anInstruction, inst) == MCDisassembler::Success)
+	{
+		const MCInstrDesc &desc = MipsInsts[inst.getOpcode()];
+		return desc.hasDelaySlot();
+	}
+	return NO;
+}
+
 - (int)destinationRegisterForInstruction: (uint32_t)anInstruction
 {
 	MCInst inst;
