@@ -100,12 +100,12 @@ static BOOL isKernelAddress(uint64_t anAddress)
               disassembler: (CVDisassembler*)aDisassembler
 {
 	self = [super init];
-	length = std::min((long long)[aTrace length] / 32, CacheSize);
+	length = std::min(((long long)[aTrace length] / 32)-anIndex, CacheSize);
 	start = anIndex;
 	struct RegisterState *ors = &initialRegisterSet;
 	uint16_t lastCycleCount = 0;
 
-	for (NSInteger i=anIndex ; i<(anIndex+length) ; i++)
+	for (NSInteger i=anIndex ; i<length ; i++)
 	{
 		struct cheri_debug_trace_entry_disk traceEntry;
 		[aTrace getBytes: &traceEntry
