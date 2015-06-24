@@ -1,9 +1,9 @@
 #import "CVColors.h"
-#import <Cocoa/Cocoa.h>
-
 
 static NSColor *greenColor;
 static NSColor *redColor;
+
+typedef cheri::disassembler::instruction_info::instruction_type inst_type;
 
 @implementation CVColors : NSObject
 + (void)initialize
@@ -31,15 +31,15 @@ static NSColor *redColor;
 {
 	return redColor;
 }
-+ (NSColor*)colorForInstructionType: (CVInstructionType)aType
++ (NSColor*)colorForInstructionType: (inst_type)aType
 {
 	switch (aType)
 	{
-		case CVInstructionTypeUnknown:
+		case cheri::disassembler::instruction_info::unknown:
 			return [NSColor blackColor];
-		case CVInstructionTypeFlowControl:
+		case cheri::disassembler::instruction_info::flow_control:
 			return [self flowControlInstructionColor];
-		case CVInstructionTypeMemory:
+		case cheri::disassembler::instruction_info::memory_access:
 			return [self memoryInstructionColor];
 	}
 }

@@ -1,9 +1,9 @@
-#import "CVStreamTrace.h"
 #import "CVDisassemblyController.h"
-#import "CVDisassembler.h"
-#import "CVObjectFile.h"
+#include "cheritrace/disassembler.hh"
 #import "CVColors.h"
 #import <Cocoa/Cocoa.h>
+
+using namespace cheri::disassembler;
 
 BOOL WriteTableViewToPasteboard(id<NSTableViewDataSource> data,
                                 NSTableView *aTableView,
@@ -50,7 +50,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	/**
 	 * The function currently being shown.
 	 */
-	CVFunction *currentFunction;
+	std::shared_ptr<cheri::objectfile::function> currentFunction;
 	/**
 	 * The address at which this function starts.
 	 */
@@ -58,15 +58,11 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	/**
 	 * Disassembler for human-friendly display.
 	 */
-	CVDisassembler *disassembler;
-}
-- (void)awakeFromNib
-{
-	disassembler = [CVDisassembler new];
+	disassembler disassembler;
 }
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [currentFunction numberOfInstructions];
+	return (currentFunction == nullptr) ? 0 : currentFunction->size()/4;
 }
 -             (id)tableView: (NSTableView*)aTableView
   objectValueForTableColumn: (NSTableColumn*)aTableColumn
@@ -81,32 +77,34 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	if ([@"instruction" isEqualToString: columnId])
 	{
 		return stringWithColor([NSString stringWithFormat: @"0x%.8x",
-			[currentFunction instructionAtAddress: 4*rowIndex]], nil);
+			(*currentFunction)[4*rowIndex]], nil);
 	}
 	NSAssert([@"disassembly" isEqualToString: columnId], @"Unexpected column id!");
-	uint32_t instr = [currentFunction instructionAtAddress: 4*rowIndex];
-	NSColor *textColor = [CVColors colorForInstructionType: [disassembler typeOfInstruction: instr]];
-	NSString *instruction = [disassembler disassembleInstruction: instr];
+	uint32_t instr = (*currentFunction)[4*rowIndex];
+	auto info = disassembler.disassemble(instr);
+	NSColor *textColor = [CVColors colorForInstructionType: info.type];
+	NSString *instruction = [NSString stringWithUTF8String: info.name.c_str()];
 	return stringWithColor(instruction, textColor);
 }
 - (void)scrollAddressToVisible: (uint64_t)anAddress
 {
 	uint64_t rowIdx = anAddress - startAddress;
 	rowIdx /= 4;
-	if (rowIdx > 0 && rowIdx < [currentFunction numberOfInstructions])
+	if (rowIdx > 0 && rowIdx < currentFunction->size())
 	{
 		[disassembly scrollRowToVisible: rowIdx];
 		[disassembly selectRow: rowIdx byExtendingSelection: NO];
 	}
 }
-- (void)setFunction: (CVFunction*)aFunction withBaseAddress: (uint64_t)aBase
+- (void)setFunction: (std::shared_ptr<cheri::objectfile::function>&)aFunction
+	withBaseAddress: (uint64_t)aBase
 {
 	if (aFunction != currentFunction)
 	{
 		startAddress = aBase;
 		currentFunction = aFunction;
-		[nameField setStringValue: [aFunction mangledName]];
-		[demangledNameField setStringValue: [aFunction demangledName]];
+		[nameField setStringValue: [NSString stringWithUTF8String: aFunction->mangled_name().c_str()]];
+		[demangledNameField setStringValue: [NSString stringWithUTF8String: aFunction->demangled_name().c_str()]];
 		[disassembly reloadData];
 	}
 }

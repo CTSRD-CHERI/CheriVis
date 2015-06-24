@@ -1,13 +1,27 @@
-#import "CVStreamTrace.h"
+#import "cheritrace/cheritrace.hh"
 #import "CVDisassemblyController.h"
-#import "CVAddressMap.h"
-#import "CVObjectFile.h"
 #import "CVCallGraph.h"
 #import "CVColors.h"
+#include "cheritrace/addressmap.hh"
+#include "cheritrace/objectfile.hh"
 #import <Cocoa/Cocoa.h>
+#include <unordered_map>
+#include <regex>
+#include <thread>
+
+using std::shared_ptr;
+using namespace cheri;
+using cheri::streamtrace::debug_trace_entry;
 
 @interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
 @end
+
+NSString *CVStreamTraceLoadedEntriesNotification = @"CVStreamTraceLoadedEntriesNotification";
+NSString *CVCallGraphSelectionChangedNotification = @"_CVCallGraphSelectionChangedNotification";
+NSString *kCVStreamTraceLoadedEntriesCount = @"kCVStreamTraceLoadedEntriesCount";
+NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
+NSString *kCVCallGraphSelectedAddressRange = @"kCVCallGraphSelectedAddressRange";
+
 
 /**
  * Convenience function that writes the contents of a table view to a pasteboard in RTF format.
@@ -65,6 +79,35 @@ static NSString *openFile(NSString *title)
 	return nil;
 }
 
+@interface CVMainThreadProxy : NSProxy
+- (id)initWithReceiver: (id)proxied;
+@end
+@implementation CVMainThreadProxy
+{
+	id forward;
+}
+- (id)initWithReceiver: (id)proxied
+{
+	forward = proxied;
+	return self;
+}
+- (NSMethodSignature*)methodSignatureForSelector: (SEL)aSelector
+{
+	return [forward methodSignatureForSelector: aSelector];
+}
+- (void)forwardInvocation: (NSInvocation *)invocation
+{
+	[invocation performSelectorOnMainThread: @selector(invokeWithTarget:) withObject: forward waitUntilDone: YES];
+}
+@end
+
+@implementation NSObject (inMainThread)
+- (id)inMainThread
+{
+	return [[CVMainThreadProxy alloc] initWithReceiver: self];
+}
+@end
+
 /**
  * Helper function that creates an attributed string by applying a single
  * colour and a fixed-width font to a string.
@@ -76,27 +119,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		font, NSFontAttributeName,
 		color, NSForegroundColorAttributeName, nil];
 	return [[NSAttributedString alloc] initWithString: str attributes: dict];
-}
-
-/**
- * Helper function that matches a string against either another string or a
- * regular expression.  This is used to implement the search box, which allows
- * various aspects of the state to be matched against either a string or a
- * regular expression.
- */
-static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex)
-{
-	if (isRegex)
-	{
-		NSRegularExpression *p = pattern;
-		return ([p numberOfMatchesInString: string
-		                           options: 0
-		                             range: NSMakeRange(0, [string length])] > 0);
-	}
-	else
-	{
-		return ([string rangeOfString: pattern].location != NSNotFound);
-	}
 }
 
 @implementation NSTableView (Copy)
@@ -179,25 +201,32 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	/**
 	 * The currently loaded stream trace.
 	 */
-	CVStreamTrace *streamTrace;
+	shared_ptr<streamtrace::trace> streamTrace;
+	/**
+	 * The view on the streamtrace that corresponds to kernel addresses.
+	 */
+	shared_ptr<streamtrace::trace> kernelTrace;
+	/**
+	 * The view on the streamtrace that corresponds to userspace addresses.
+	 */
+	shared_ptr<streamtrace::trace> userTrace;
 	/**
 	 * The address map, containing the parsed procstat information, which maps
 	 * from address ranges to files.
 	 */
-	CVAddressMap *addressMap;
+	std::shared_ptr<cheri::addressmap> addressMap;
 	/**
 	 * Cached list of the integer register names.
 	 */
 	NSArray *integerRegisterNames;
 	/**
-	 * The current integer register values.
+	 * The current register values.
 	 */
-	NSArray *integerRegisterValues;
-	// TODO: This might be better as an NSCache
+	streamtrace::register_set registers;
 	/**
 	 * Dictionary of all of the object files that we've loaded.
 	 */
-	NSMutableDictionary *objectFiles;
+	std::unordered_map<std::string, shared_ptr<objectfile::file>> objectFiles;
 	/**
 	 * Messages that will be put in the title bar.
 	 */
@@ -218,8 +247,6 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	[regsView setDataSource: self];
 
 	messages = [NSMutableDictionary new];
-
-	objectFiles = [NSMutableDictionary new];
 
 	[[NSNotificationCenter defaultCenter]
 	    addObserver: self
@@ -260,19 +287,16 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	}
 	[mainWindow setTitle: title];
 }
-- (void)setTraceToRow: (NSUInteger)aRow
+- (shared_ptr<streamtrace::trace>&)currentTrace
 {
 	BOOL showKern = [showKernel state] == NSOnState;
 	BOOL showUser = [showUserspace state] == NSOnState;
-	if (showKern && !showUser)
+	auto &trace = showKern ? (showUser ? streamTrace : kernelTrace) : userTrace;
+	if (trace == nullptr)
 	{
-		aRow = [streamTrace kernelTraceEntryAtIndex: aRow];
+		trace = streamTrace;
 	}
-	else if (showUser && !showKern)
-	{
-		aRow = [streamTrace userspaceTraceEntryAtIndex: aRow];
-	}
-	[streamTrace setStateToIndex: aRow];
+	return trace;
 }
 - (void)defaultsDidChange: (NSNotification*)aNotification
 {
@@ -306,11 +330,12 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		[statusBar setStringValue: [NSString stringWithFormat: @"Selected %ld rows", count]];
 		return;
 	}
+	auto trace = [self currentTrace];
 
-	[self setTraceToRow: last];
-	uint64_t cycles = [streamTrace cycleCount];
-	[self setTraceToRow: first];
-	cycles -= [streamTrace cycleCount];
+	trace->seek_to(last);
+	uint64_t cycles = trace->get_entry().cycles;
+	trace->seek_to(first);
+	cycles -= trace->get_entry().cycles;
 
 	[statusBar setStringValue: [NSString stringWithFormat: @"Selected %ld rows, %" PRId64 " cycles", count, cycles]];
 }
@@ -323,18 +348,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 }
 - (void)searchWithIncrement: (NSUInteger)increment
 {
-	NSInteger end = [traceView selectedRow];
+	NSInteger start = [traceView selectedRow];
 	// If no row is selected, start from 0
-	if (end == -1)
+	if (start == -1)
 	{
-		end = 0;
+		start = 0;
 	}
-	NSInteger i = end;
-	NSInteger wrap = [streamTrace numberOfTraceEntries];
-	if (wrap == 0)
-	{
-		return;
-	}
+	uint64_t end = streamTrace->size();
+
 	BOOL idxs = [searchIndexes state] == NSOnState;
 	BOOL addrs = [searchAddresses state] == NSOnState;
 	BOOL instrs = [searchInstructions state] == NSOnState;
@@ -342,100 +363,94 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	BOOL regs = [searchRegisterValues state] == NSOnState;
 	BOOL isRegex = [regexSearch state] == NSOnState;
 
-	id search = [searchText stringValue];
+	NSString *search = [searchText stringValue];
 	NSInteger foundReg = NSNotFound;
+	std::function<bool(const std::string &)> match;
 	// If the string is supposed to be a regular expression, parse it and
 	// report an error.  The matchStringOrRegex() function will use this for
 	// matching if required.
 	if (isRegex)
 	{
-		NSError *error = nil;
-		search = [NSRegularExpression regularExpressionWithPattern: search
-		                                                   options: 0
-		                                                     error: &error];
-		if (error != nil)
-		{
-			[[NSAlert alertWithError: error] runModal];
-			return;
-		}
+		std::regex r([search UTF8String]);
+		match = [r](const std::string &text) {
+			return std::regex_search(text, r);
+		};
 	}
-
-	do
+	else
 	{
-		i += increment;
-		if (i >= wrap)
-		{
-			i = 0;
-		}
-		if (i < 0)
-		{
-			i = wrap - 1;
-		}
-		[self setTraceToRow: i];
+		std::string s([search UTF8String]);
+		match = [s](const std::string &text) {
+			return text.find(s) != std::string::npos;
+		};
+	}
+	auto trace = [self currentTrace];
+	locale_t cloc = newlocale(LC_ALL_MASK, NULL, NULL);
+	disassembler::disassembler dis;
+
+	bool found = false;
+	NSInteger i;
+	trace->scan([&](debug_trace_entry e, uint64_t idx) {
+		const size_t buffer_size = 2 /* 0x */ + 16 /* 64 bits */ + 1 /* null terminator */;
+		char buffer[buffer_size];
 		if (idxs)
 		{
-			NSString *str = [NSString stringWithFormat: @"%ld", (long)i];
-			if (matchStringOrRegex(str, search, isRegex))
-			{
-				break;
-			}
+			snprintf_l(buffer, buffer_size, cloc, "%" PRIu64, idx);
+			std::string s(buffer);
+			found  = match(s);
 		}
-		if (addrs)
+		if (!found && addrs)
 		{
-			NSString *str = [NSString stringWithFormat: @"0x%.16" PRIx64, [streamTrace programCounter]];
-			if (matchStringOrRegex(str, search, isRegex))
-			{
-				break;
-			}
+			snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, e.pc);
+			std::string s(buffer);
+			found  = match(s);
 		}
-		if (instrs)
+		if (!found && instrs)
 		{
-			NSString *str = [NSString stringWithFormat: @"0x%.8" PRIx32, [streamTrace encodedInstruction]];
-			if (matchStringOrRegex(str, search, isRegex))
-			{
-				break;
-			}
+			snprintf_l(buffer, buffer_size, cloc,"0x%.8" PRIx32, e.inst);
+			std::string s(buffer);
+			found  = match(s);
 		}
-		if (disasm)
+		if (!found && disasm)
 		{
-			NSString *str = [streamTrace instruction];
-			uint8_t ex = [streamTrace exception];
-			if (ex != 31)
+			auto instr = dis.disassemble(e.inst);
+			std::string s(std::move(instr.name));
+			if (e.exception != 31)
 			{
-				str = [NSString stringWithFormat: @"%@ [ Exception 0x%x ]", str, ex];
+				snprintf_l(buffer, buffer_size, cloc, "%x", e.exception);
+				s += " [ Exception 0x";
+				s += buffer;
+				s += " ]";
 			}
-			if (matchStringOrRegex(str, search, isRegex))
-			{
-				break;
-			}
+			found  = match(s);
 		}
-		if (regs)
+		if (!found && regs)
 		{
-			NSArray *intRegs = [streamTrace integerRegisters];
-			BOOL found = NO;
-			NSInteger regIdx=-1;
-			for (id reg in intRegs)
+			trace->seek_to(idx);
+			auto rs = trace->get_regs();
+			NSInteger regIdx=0;
+			for (uint64_t gpr : rs.gpr)
 			{
 				regIdx++;
-				if ([reg isKindOfClass: [NSString class]])
+				snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, gpr);
+				std::string s(buffer);
+				found = match(s);
+				if (found)
 				{
-					continue;
-				}
-				NSString *str = [NSString stringWithFormat: @"0x%.16llx", [reg longLongValue]];
-				if (matchStringOrRegex(str, search, isRegex))
-				{
-					found = YES;
 					foundReg = regIdx;
 					break;
 				}
 			}
-			if (found)
-			{
-				break;
-			}
 		}
-	} while (end != i);
-	if (i != end)
+		if (found)
+		{
+			i = idx;
+		}
+		return found;
+	}, start, end);
+	freelocale(cloc);
+	// FIXME: search backwards!
+	// FIXME: Wrap!
+	if (found)
 	{
 		[traceView scrollRowToVisible: i];
 		[traceView selectRow: i byExtendingSelection: NO];
@@ -458,23 +473,50 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 {
 	[self searchWithIncrement: -1];
 }
+- (void)loadedKernel: (std::shared_ptr<streamtrace::trace>)kernel
+				user: (std::shared_ptr<streamtrace::trace>)user
+			forTrace: (std::shared_ptr<streamtrace::trace>)originalTrace
+{
+	if (streamTrace.get() == originalTrace.get())
+	{
+		kernelTrace = std::move(kernel);
+		userTrace = std::move(user);
+		[traceView reloadData];
+	}
+
+}
 - (IBAction)openTrace: (id)sender
 {
 	NSString *file = openFile(@"Open Stream Trace");
 	if (file != nil)
 	{
-		NSData *traceData = [NSData dataWithContentsOfMappedFile: file];
+		std::string fileName([file UTF8String]);
 		NSString *notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
 		NSError *error = nil;
-		streamTrace = [[CVStreamTrace alloc] initWithTraceData: traceData
-		                                         notesFileName: notesFile
-														 error: &error];
-		if (error)
+		// FIXME: load notes
+		streamTrace = streamtrace::trace::open(fileName);
+		if (!streamTrace)
 		{
-			[NSApp presentError: error];
+			// FIXME: Sensible error
+			[NSApp presentError: nil];
+			return;
 		}
+		std::thread([self](){
+			auto traceRefCopy = streamTrace;
+			auto kernel = streamTrace->filter([](const streamtrace::debug_trace_entry &e) { return e.is_kernel(); });
+			auto user = kernel->inverted_view();
+			[[self inMainThread] loadedKernel: kernel
+										 user: user
+									 forTrace: traceRefCopy];
+		}).detach();
 		[traceView reloadData];
-		integerRegisterNames = [streamTrace integerRegisterNames];
+		NSMutableArray *names = [NSMutableArray new];
+		for (const char *name : cheri::disassembler::MipsRegisterNames)
+		{
+			[names addObject: [NSString stringWithUTF8String: name]];
+		}
+		// Get an immutable version of the array
+		integerRegisterNames = [names copy];
 		traceDirectory = [file stringByDeletingLastPathComponent];
 	}
 }
@@ -483,12 +525,12 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	NSString *file = openFile(@"Open output from procstat -v");
 	if (file != nil)
 	{
-		NSString *procstat = [NSString stringWithContentsOfFile: file];
-		addressMap = [[CVAddressMap alloc] initWithProcstatOutput: procstat];
+		addressMap = cheri::addressmap::open_procstat(std::string([file UTF8String]));
 	}
 }
 - (IBAction)callGraph:(id)sender
 {
+#if 0
 	// Currently disabled.  Eventually, we should construct a call graph from a
 	// specific range.
 	if ((addressMap != nil) && (streamTrace != nil))
@@ -500,30 +542,16 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 							return [self functionForPC: &pc isRelocated: NULL rangeStart: NULL];
 						}];
 	}
-
+#endif
 }
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if (aTableView == traceView)
 	{
-		BOOL showKern = [showKernel state] == NSOnState;
-		BOOL showUser = [showUserspace state] == NSOnState;
-		if (showKern && showUser)
-		{
-			return [streamTrace numberOfTraceEntries];
-		}
-		if (showKern)
-		{
-			return [streamTrace numberOfKernelTraceEntries];
-		}
-		if (showUser)
-		{
-			return [streamTrace numberOfUserspaceTraceEntries];
-		}
-		return 0;
+		return (streamTrace == nullptr) ? 0 : [self currentTrace]->size();
 	}
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
-	return (streamTrace == nil) ? 0 : 32;
+	return (streamTrace == nullptr) ? 0 : 32;
 }
 -             (id)tableView: (NSTableView*)aTableView
   objectValueForTableColumn: (NSTableColumn*)aTableColumn
@@ -532,30 +560,34 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	NSString *columnId = [aTableColumn identifier];
 	if (aTableView == traceView)
 	{
-		[self setTraceToRow: rowIndex];
+		auto trace = [self currentTrace];
+		trace->seek_to(rowIndex);
+		auto entry = trace->get_entry();
 		if ([@"pc" isEqualToString: columnId])
 		{
-			NSColor *textColor = [streamTrace isKernel] ?
+			NSColor *textColor = entry.is_kernel() ?
 				[CVColors kernelAddressColor] : [CVColors userspaceAddressColor];
 			return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64,
-					[streamTrace programCounter]], textColor);
+					entry.pc], textColor);
 		}
 		if ([@"instruction" isEqualToString: columnId])
 		{
 			return stringWithColor([NSString stringWithFormat: @"0x%.8x", 
-					[streamTrace encodedInstruction]], [NSColor blackColor]);
+					entry.inst], [NSColor blackColor]);
 		}
 		if ([@"disassembly" isEqualToString: columnId])
 		{
-			NSColor *textColor = [CVColors colorForInstructionType: [streamTrace instructionType]];
-			NSString *instr = [streamTrace instruction];
+			disassembler::disassembler dis;
+			auto info = dis.disassemble(entry.inst);
+			NSColor *textColor = [CVColors colorForInstructionType: info.type];
+			NSString *instr = [NSString stringWithUTF8String: info.name.c_str()];
 			NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
-			uint8_t ex = [streamTrace exception];
+			uint8_t ex = entry.exception;
 			if (ex != 31)
 			{
 				[field appendAttributedString: stringWithColor([NSString stringWithFormat:@" [ Exception 0x%x ]", ex], [NSColor redColor])];
 			}
-			NSUInteger deadCycles = [streamTrace deadCycles];
+			NSUInteger deadCycles = entry.cycles;
 			if (deadCycles > 0)
 			{
 				NSString *str = [NSString stringWithFormat: @" ; %lld dead cycles", (long long)deadCycles];
@@ -566,9 +598,10 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 		}
 		if ([@"index" isEqualToString: columnId])
 		{
-			return [NSString stringWithFormat: @"%lld", (long long)rowIndex];
+			return [NSString stringWithFormat: @"%" PRId64, trace->instruction_number_for_index(rowIndex)];
 		}
-		NSString *notes = [streamTrace notes];
+		// FIXME: load notes, owned by this object.
+		NSString *notes = nil;//[streamTrace notes];
 		// Work around a GNUstep bug where nil in a table view is not editable.
 		return notes ? notes : @" ";
 	}
@@ -580,17 +613,18 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	}
 	if ([@"value" isEqualToString: columnId])
 	{
-		id value = [integerRegisterValues objectAtIndex: rowIndex];
-		if (value == nil)
+		NSUInteger gpridx = rowIndex - 1;
+		if (rowIndex == 0)
 		{
-			return nil;
+			return @"0";
 		}
-		if ([value isKindOfClass: [NSNumber class]])
+		NSAssert(gpridx >= 0 && gpridx<31, @"GPR index out of range");
+		if (!registers.valid_gprs[gpridx])
 		{
-			return stringWithColor([NSString stringWithFormat: @"0x%.16llx", [value longLongValue]], [NSColor blackColor]);
+			return stringWithColor(@"???", [NSColor redColor]);
 		}
-		NSAssert([value isKindOfClass: [NSString class]], @"Unexpected register value!");
-		return stringWithColor(value, [NSColor redColor]);
+		uint64_t value = registers.gpr[gpridx];
+		return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64, value], [NSColor blackColor]);
 	}
 	return nil;
 }
@@ -603,6 +637,8 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		return;
 	}
+	// FIXME: Make notes work again
+#if 0
 	[streamTrace setStateToIndex: rowIndex];
 	NSError *error = nil;
 	[streamTrace setNotes: [anObject description] error: &error];
@@ -610,37 +646,39 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		[NSApp presentError: error];
 	}
+#endif
 
 }
-- (CVFunction*)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
+- (std::shared_ptr<objectfile::function>)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
 {
 	uint64_t pc = *aPc;
-	CVAddressRange range = [addressMap mappingForAddress: pc];
-	if (range.fileName == 0)
+	auto range = addressMap->mapping_for_address(pc);
+	if (range.file_name == std::string())
 	{
 		NSLog(@"Could not find address range");
-		return nil;
+		return nullptr;
 	}
 	if (rs != NULL)
 	{
 		*rs = range.start;
 	}
-	CVObjectFile *objectFile = [objectFiles objectForKey: range.fileName];
-	if (nil == objectFile)
+	auto objectFile = objectFiles[range.file_name];
+	NSString *fileName = [NSString stringWithUTF8String: range.file_name.c_str()];
+	if (objectFile == nullptr)
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *fileName = range.fileName;
+		NSString *fileName = [NSString stringWithUTF8String: range.file_name.c_str()];
 		NSString *path = [traceDirectory stringByAppendingPathComponent: [fileName lastPathComponent]];
 		if ([fm fileExistsAtPath: path])
 		{
-			objectFile = [CVObjectFile objectFileForFilePath: path];
+			objectFile = objectfile::file::open(std::string([path UTF8String]));
 		}
 		if (objectFile == nil)
 		{
 			path = [traceDirectory stringByAppendingPathComponent: fileName];
 			if ([fm fileExistsAtPath: path])
 			{
-				objectFile = [CVObjectFile objectFileForFilePath: path];
+				objectFile = objectfile::file::open(std::string([path UTF8String]));
 			}
 		}
 		if (objectFile == nil)
@@ -648,7 +686,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 			path = openFile([NSString stringWithFormat: @"Open object file: %@", fileName]);
 			if (path != nil)
 			{
-				objectFile = [CVObjectFile objectFileForFilePath: path];
+				objectFile = objectfile::file::open(std::string([path UTF8String]));
 				if (objectFile == nil)
 				{
 					[[NSAlert alertWithMessageText: @"Unable to open object file"
@@ -660,13 +698,14 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 				}
 			}
 		}
-		if (objectFile != nil)
+		if (objectFile == nullptr)
 		{
-			[objectFiles setObject: objectFile forKey: range.fileName];
+			return nullptr;
 		}
+		objectFiles[range.file_name] = objectFile;
 	}
 	BOOL isRelocated = NO;
-	if ([[range.fileName lastPathComponent] rangeOfString: @".so"].location != NSNotFound)
+	if ([[fileName lastPathComponent] rangeOfString: @".so"].location != NSNotFound)
 	{
 		pc -= range.start;
 		isRelocated = YES;
@@ -676,7 +715,7 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		*outBool = isRelocated;
 	}
-	return [objectFile functionForAddress: pc];
+	return objectFile->function_at_address(pc);
 }
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
@@ -684,32 +723,23 @@ static inline BOOL matchStringOrRegex(NSString *string, id pattern, BOOL isRegex
 	{
 		[regsView reloadData];
 		NSUInteger selectedRow = [traceView selectedRow];
-		BOOL showKern = [showKernel state] == NSOnState;
-		BOOL showUser = [showUserspace state] == NSOnState;
-		if (showKern && !showUser)
-		{
-			selectedRow = [streamTrace kernelTraceEntryAtIndex: selectedRow];
-		}
-		else if (showUser && !showKern)
-		{
-			selectedRow = [streamTrace userspaceTraceEntryAtIndex: selectedRow];
-		}
-		[streamTrace setStateToIndex: selectedRow];
-		integerRegisterValues = [streamTrace integerRegisters];
+		auto trace = [self currentTrace];
+		trace->seek_to(selectedRow);
+		registers = std::move(trace->get_regs());
 		if (addressMap == nil)
 		{
 			return;
 		}
-		uint64_t pc = [streamTrace programCounter];
+		uint64_t pc = trace->get_entry().pc;
 		BOOL isRelocated;
 		uint64_t rs;
-		CVFunction *func = [self functionForPC: &pc isRelocated: &isRelocated rangeStart: &rs];
-		if (func == nil)
+		auto func = [self functionForPC: &pc isRelocated: &isRelocated rangeStart: &rs];
+		if (func == nullptr)
 		{
 			return;
 		}
 		[disassembly setFunction: func
-		         withBaseAddress: [func baseAddress] + (isRelocated ? rs : 0)];
+		         withBaseAddress: func->base_address() + (isRelocated ? rs : 0)];
 		[disassembly scrollAddressToVisible: pc + (isRelocated ? rs : 0)];
 	}
 }

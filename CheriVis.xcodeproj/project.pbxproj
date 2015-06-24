@@ -7,21 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		28459D20188620EC00798DAC /* CheriVis.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D11188620EC00798DAC /* CheriVis.m */; };
-		28459D21188620EC00798DAC /* CVAddressMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D13188620EC00798DAC /* CVAddressMap.m */; };
-		28459D22188620EC00798DAC /* CVCallGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D15188620EC00798DAC /* CVCallGraph.m */; };
-		28459D23188620EC00798DAC /* CVColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D17188620EC00798DAC /* CVColors.m */; };
-		28459D24188620EC00798DAC /* CVDisassembler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D19188620EC00798DAC /* CVDisassembler.mm */; };
-		28459D25188620EC00798DAC /* CVDisassemblyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1B188620EC00798DAC /* CVDisassemblyController.m */; };
-		28459D26188620EC00798DAC /* CVObjectFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1D188620EC00798DAC /* CVObjectFile.mm */; };
-		28459D27188620EC00798DAC /* CVStreamTrace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1F188620EC00798DAC /* CVStreamTrace.mm */; };
+		28459D23188620EC00798DAC /* CVColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D17188620EC00798DAC /* CVColors.mm */; };
+		28459D25188620EC00798DAC /* CVDisassemblyController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1B188620EC00798DAC /* CVDisassemblyController.mm */; };
 		28459D291886225D00798DAC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D281886225D00798DAC /* main.m */; };
+		28C925871B0C0F50004091DE /* CheriVis.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28C925861B0C0F50004091DE /* CheriVis.mm */; };
 		28D774FB1A0B79D50035F189 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D774FA1A0B79D50035F189 /* main.m */; };
-		28D774FF1A0B7BA00035F189 /* CVDisassembler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D19188620EC00798DAC /* CVDisassembler.mm */; };
-		28D775001A0B7BA00035F189 /* CVObjectFile.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1D188620EC00798DAC /* CVObjectFile.mm */; };
-		28D775011A0B7BA00035F189 /* CVStreamTrace.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1F188620EC00798DAC /* CVStreamTrace.mm */; };
 		28D775041A0B85A90035F189 /* CVTraceAnalyse.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D775031A0B85A90035F189 /* CVTraceAnalyse.m */; };
-		28D775051A0B8A860035F189 /* CVAddressMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D13188620EC00798DAC /* CVAddressMap.m */; };
 		28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
 		28E5373118862022006FE3AE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28E5372F18862022006FE3AE /* InfoPlist.strings */; };
 		28E5373718862022006FE3AE /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373518862022006FE3AE /* Credits.rtf */; };
@@ -53,22 +44,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		28459D11188620EC00798DAC /* CheriVis.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CheriVis.m; sourceTree = SOURCE_ROOT; };
-		28459D12188620EC00798DAC /* CVAddressMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVAddressMap.h; sourceTree = SOURCE_ROOT; };
-		28459D13188620EC00798DAC /* CVAddressMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVAddressMap.m; sourceTree = SOURCE_ROOT; };
 		28459D14188620EC00798DAC /* CVCallGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVCallGraph.h; sourceTree = SOURCE_ROOT; };
 		28459D15188620EC00798DAC /* CVCallGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVCallGraph.m; sourceTree = SOURCE_ROOT; };
 		28459D16188620EC00798DAC /* CVColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVColors.h; sourceTree = SOURCE_ROOT; };
-		28459D17188620EC00798DAC /* CVColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVColors.m; sourceTree = SOURCE_ROOT; };
-		28459D18188620EC00798DAC /* CVDisassembler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassembler.h; sourceTree = SOURCE_ROOT; };
-		28459D19188620EC00798DAC /* CVDisassembler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVDisassembler.mm; sourceTree = SOURCE_ROOT; };
+		28459D17188620EC00798DAC /* CVColors.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVColors.mm; sourceTree = SOURCE_ROOT; };
 		28459D1A188620EC00798DAC /* CVDisassemblyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassemblyController.h; sourceTree = SOURCE_ROOT; };
-		28459D1B188620EC00798DAC /* CVDisassemblyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVDisassemblyController.m; sourceTree = SOURCE_ROOT; };
-		28459D1C188620EC00798DAC /* CVObjectFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVObjectFile.h; sourceTree = SOURCE_ROOT; };
-		28459D1D188620EC00798DAC /* CVObjectFile.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVObjectFile.mm; sourceTree = SOURCE_ROOT; };
-		28459D1E188620EC00798DAC /* CVStreamTrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVStreamTrace.h; sourceTree = SOURCE_ROOT; };
-		28459D1F188620EC00798DAC /* CVStreamTrace.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVStreamTrace.mm; sourceTree = SOURCE_ROOT; };
+		28459D1B188620EC00798DAC /* CVDisassemblyController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVDisassemblyController.mm; sourceTree = SOURCE_ROOT; };
 		28459D281886225D00798DAC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		28C925861B0C0F50004091DE /* CheriVis.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CheriVis.mm; sourceTree = SOURCE_ROOT; };
 		28D774F81A0B79D50035F189 /* traceanalyse */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = traceanalyse; sourceTree = BUILT_PRODUCTS_DIR; };
 		28D774FA1A0B79D50035F189 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		28D775021A0B85A90035F189 /* CVTraceAnalyse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVTraceAnalyse.h; sourceTree = "<group>"; };
@@ -165,21 +148,13 @@
 			isa = PBXGroup;
 			children = (
 				28459D281886225D00798DAC /* main.m */,
-				28459D11188620EC00798DAC /* CheriVis.m */,
-				28459D12188620EC00798DAC /* CVAddressMap.h */,
-				28459D13188620EC00798DAC /* CVAddressMap.m */,
+				28C925861B0C0F50004091DE /* CheriVis.mm */,
 				28459D14188620EC00798DAC /* CVCallGraph.h */,
 				28459D15188620EC00798DAC /* CVCallGraph.m */,
 				28459D16188620EC00798DAC /* CVColors.h */,
-				28459D17188620EC00798DAC /* CVColors.m */,
-				28459D18188620EC00798DAC /* CVDisassembler.h */,
-				28459D19188620EC00798DAC /* CVDisassembler.mm */,
+				28459D17188620EC00798DAC /* CVColors.mm */,
 				28459D1A188620EC00798DAC /* CVDisassemblyController.h */,
-				28459D1B188620EC00798DAC /* CVDisassemblyController.m */,
-				28459D1C188620EC00798DAC /* CVObjectFile.h */,
-				28459D1D188620EC00798DAC /* CVObjectFile.mm */,
-				28459D1E188620EC00798DAC /* CVStreamTrace.h */,
-				28459D1F188620EC00798DAC /* CVStreamTrace.mm */,
+				28459D1B188620EC00798DAC /* CVDisassemblyController.mm */,
 				28E5373B18862022006FE3AE /* MainMenu.xib */,
 				28E5373E18862022006FE3AE /* Images.xcassets */,
 				28E5372D18862022006FE3AE /* Supporting Files */,
@@ -317,11 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28D775011A0B7BA00035F189 /* CVStreamTrace.mm in Sources */,
 				28D775041A0B85A90035F189 /* CVTraceAnalyse.m in Sources */,
-				28D775001A0B7BA00035F189 /* CVObjectFile.mm in Sources */,
-				28D774FF1A0B7BA00035F189 /* CVDisassembler.mm in Sources */,
-				28D775051A0B8A860035F189 /* CVAddressMap.m in Sources */,
 				28D774FB1A0B79D50035F189 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -330,15 +301,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28459D23188620EC00798DAC /* CVColors.m in Sources */,
-				28459D20188620EC00798DAC /* CheriVis.m in Sources */,
-				28459D21188620EC00798DAC /* CVAddressMap.m in Sources */,
-				28459D25188620EC00798DAC /* CVDisassemblyController.m in Sources */,
-				28459D24188620EC00798DAC /* CVDisassembler.mm in Sources */,
-				28459D22188620EC00798DAC /* CVCallGraph.m in Sources */,
-				28459D27188620EC00798DAC /* CVStreamTrace.mm in Sources */,
+				28C925871B0C0F50004091DE /* CheriVis.mm in Sources */,
+				28459D23188620EC00798DAC /* CVColors.mm in Sources */,
+				28459D25188620EC00798DAC /* CVDisassemblyController.mm in Sources */,
 				28459D291886225D00798DAC /* main.m in Sources */,
-				28459D26188620EC00798DAC /* CVObjectFile.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,6 +438,8 @@
 					"-lLLVMMipsAsmPrinter",
 					"-lLLVMMC",
 					"-lLLVMSupport",
+					"-Lcheritrace/Build",
+					"-lcheritrace",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -558,6 +526,8 @@
 					"-lLLVMMipsAsmPrinter",
 					"-lLLVMMC",
 					"-lLLVMSupport",
+					"-Lcheritrace/Build",
+					"-lcheritrace",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -713,6 +683,8 @@
 					"-lLLVMMipsAsmPrinter",
 					"-lLLVMMC",
 					"-lLLVMSupport",
+					"-Lcheritrace/Build",
+					"-lcheritrace",
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -802,6 +774,8 @@
 					"-lLLVMMipsAsmPrinter",
 					"-lLLVMMC",
 					"-lLLVMSupport",
+					"-Lcheritrace/Build",
+					"-lcheritrace",
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -859,6 +833,7 @@
 				28D774FD1A0B79D50035F189 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		28E5371E18862022006FE3AE /* Build configuration list for PBXProject "CheriVis" */ = {
 			isa = XCConfigurationList;

@@ -1,4 +1,5 @@
 #import <AppKit/NSTableView.h>
+#include "cheritrace/objectfile.hh"
 
 @class CVFunction;
 #ifdef GNUSTEP
@@ -19,5 +20,5 @@
  * Sets the current function.  The base address is the address in memory where
  * the function is located.  
  */
-- (void)setFunction: (CVFunction*)aFunction withBaseAddress: (uint64_t)aBase;
+- (void)setFunction: (std::shared_ptr<cheri::objectfile::function>&)aFunction withBaseAddress: (uint64_t)aBase;
 @end

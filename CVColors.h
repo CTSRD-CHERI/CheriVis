@@ -1,5 +1,5 @@
+#include "cheritrace/disassembler.hh"
 #import <AppKit/NSColor.h>
-#import "CVDisassembler.h"
 
 @interface CVColors : NSObject
 /**
@@ -14,7 +14,7 @@
 /**
  * Returns the colour that corresponds to the specified instruction type.
  */
-+ (NSColor*)colorForInstructionType: (CVInstructionType)aType;
++ (NSColor*)colorForInstructionType: (cheri::disassembler::instruction_info::instruction_type)aType;
 /**
  * The colour to use for memory addresses that are in the kernel.
  */
