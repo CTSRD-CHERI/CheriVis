@@ -354,7 +354,15 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	{
 		start = 0;
 	}
+	else
+	{
+		start++;
+	}
 	uint64_t end = streamTrace->size();
+	if (start >= end)
+	{
+		start = 0;
+	}
 
 	BOOL idxs = [searchIndexes state] == NSOnState;
 	BOOL addrs = [searchAddresses state] == NSOnState;
