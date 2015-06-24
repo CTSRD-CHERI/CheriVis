@@ -397,7 +397,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 
 	bool found = false;
 	NSInteger i;
-	trace->scan([&](debug_trace_entry e, uint64_t idx) {
+	auto filter = [&](debug_trace_entry e, uint64_t idx) {
 		const size_t buffer_size = 2 /* 0x */ + 16 /* 64 bits */ + 1 /* null terminator */;
 		char buffer[buffer_size];
 		if (idxs)
@@ -454,10 +454,14 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			i = idx;
 		}
 		return found;
-	}, start, end);
+	};
+	trace->scan(filter, start, end);
+	if (!found)
+	{
+		trace->scan(filter, 0, start);
+	}
 	freelocale(cloc);
 	// FIXME: search backwards!
-	// FIXME: Wrap!
 	if (found)
 	{
 		[traceView scrollRowToVisible: i];
