@@ -346,7 +346,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		   byExtendingSelection: NO];
 	[traceView scrollRowToVisible: r.location];
 }
-- (void)searchWithIncrement: (NSUInteger)increment
+- (void)searchWithIncrement: (NSInteger)increment
 {
 	NSInteger start = [traceView selectedRow];
 	// If no row is selected, start from 0
@@ -356,12 +356,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	}
 	else
 	{
-		start++;
+		start += increment;
 	}
 	uint64_t end = streamTrace->size();
 	if (start >= end)
 	{
 		start = 0;
+	}
+	else if (start < 0)
+	{
+		start = end;
 	}
 
 	BOOL idxs = [searchIndexes state] == NSOnState;
@@ -455,13 +459,23 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		}
 		return found;
 	};
-	trace->scan(filter, start, end);
-	if (!found)
+	if (increment < 0)
 	{
-		trace->scan(filter, 0, start);
+		trace->scan(filter, 0, start, streamtrace::trace::backwards);
+		if (!found)
+		{
+			trace->scan(filter, start, end, streamtrace::trace::backwards);
+		}
+	}
+	else
+	{
+		trace->scan(filter, start, end);
+		if (!found)
+		{
+			trace->scan(filter, 0, start);
+		}
 	}
 	freelocale(cloc);
-	// FIXME: search backwards!
 	if (found)
 	{
 		[traceView scrollRowToVisible: i];
