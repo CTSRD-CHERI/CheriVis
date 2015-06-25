@@ -453,25 +453,29 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 				}
 			}
 		}
-		if (found)
+		if (!found)
 		{
-			i = idx;
+			i+=increment;
 		}
 		return found;
 	};
 	if (increment < 0)
 	{
+		i = start;
 		trace->scan(filter, 0, start, streamtrace::trace::backwards);
 		if (!found)
 		{
+			i = end;
 			trace->scan(filter, start, end, streamtrace::trace::backwards);
 		}
 	}
 	else
 	{
+		i = start;
 		trace->scan(filter, start, end);
 		if (!found)
 		{
+			i = 0;
 			trace->scan(filter, 0, start);
 		}
 	}
