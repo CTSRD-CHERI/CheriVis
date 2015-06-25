@@ -12,6 +12,7 @@
 using std::shared_ptr;
 using namespace cheri;
 using cheri::streamtrace::debug_trace_entry;
+using cheri::streamtrace::register_set;
 
 @interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
 @end
@@ -409,7 +410,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 
 	bool found = false;
 	NSInteger i;
-	auto filter = [&](debug_trace_entry e, uint64_t idx) {
+	auto filter = [&](const debug_trace_entry &e, const register_set &rs, uint64_t idx) {
 		const size_t buffer_size = 2 /* 0x */ + 16 /* 64 bits */ + 1 /* null terminator */;
 		char buffer[buffer_size];
 		if (idxs)
@@ -441,12 +442,18 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 				s += buffer;
 				s += " ]";
 			}
+			NSUInteger deadCycles = e.dead_cycles;
+			if (deadCycles > 0)
+			{
+				snprintf(buffer, buffer_size, "%lld", (long long)deadCycles);
+				s += " ; ";
+				s += buffer;
+				s += " dead cycles";
+			}
 			found  = match(s);
 		}
 		if (!found && regs)
 		{
-			trace->seek_to(idx);
-			auto rs = trace->get_regs();
 			NSInteger regIdx=0;
 			for (uint64_t gpr : rs.gpr)
 			{
