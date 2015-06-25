@@ -17,10 +17,7 @@ using cheri::streamtrace::register_set;
 @interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
 @end
 
-NSString *CVStreamTraceLoadedEntriesNotification = @"CVStreamTraceLoadedEntriesNotification";
 NSString *CVCallGraphSelectionChangedNotification = @"_CVCallGraphSelectionChangedNotification";
-NSString *kCVStreamTraceLoadedEntriesCount = @"kCVStreamTraceLoadedEntriesCount";
-NSString *kCVStreamTraceLoadedAllEntries = @"kCVStreamTraceLoadedAllEntries";
 NSString *kCVCallGraphSelectedAddressRange = @"kCVCallGraphSelectedAddressRange";
 
 
@@ -98,7 +95,10 @@ static NSString *openFile(NSString *title)
 }
 - (void)forwardInvocation: (NSInvocation *)invocation
 {
-	[invocation performSelectorOnMainThread: @selector(invokeWithTarget:) withObject: forward waitUntilDone: YES];
+	[invocation retainArguments];
+	[invocation performSelectorOnMainThread: @selector(invokeWithTarget:)
+								 withObject: forward
+							  waitUntilDone: NO];
 }
 @end
 
@@ -269,11 +269,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	           name: NSUserDefaultsDidChangeNotification
 	         object: nil];
 	[[NSNotificationCenter defaultCenter]
- 	    addObserver: self
-	       selector: @selector(loadedEntries:)
-	           name: CVStreamTraceLoadedEntriesNotification
-	         object: nil];
-	[[NSNotificationCenter defaultCenter]
 		addObserver: self
 		   selector: @selector(selectRange:)
 	           name: CVCallGraphSelectionChangedNotification
@@ -313,20 +308,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	// but the easiest thing to do is just redraw everything, since redraws are
 	// cheap and changes to user defaults are infrequent.
 	[[mainWindow contentView] setNeedsDisplay: YES];
-}
-- (void)loadedEntries: (NSNotification*)aNotification
-{
-	NSDictionary *userInfo = [aNotification userInfo];
-	NSNumber *loadedEntries = [userInfo objectForKey: kCVStreamTraceLoadedEntriesCount];
-	NSNumber *loadedAllEntries = [userInfo objectForKey: kCVStreamTraceLoadedAllEntries];
-	NSUInteger loaded = [loadedEntries unsignedIntegerValue];
-	[self setMessage: [NSString stringWithFormat: @"Loaded %@ entries", loadedEntries]
-	          forKey: @"loadedCount"];
-	if ((loaded - lastLoaded > 100000) || [loadedAllEntries boolValue])
-	{
-		[traceView reloadData];
-	}
-	lastLoaded = loaded;
 }
 - (void)selectionDidChange: (NSNotification*)aNotification
 {
@@ -530,6 +511,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	}
 
 }
+- (void)loadedEntries: (uint64_t)loadedEntries done: (BOOL)isFinished
+{
+		[self setMessage: [NSString stringWithFormat: @"Loaded %" PRIu64 " entries", loadedEntries]
+				  forKey: @"loadedCount"];
+		if ((loadedEntries - lastLoaded > 100000) || isFinished)
+		{
+			[traceView reloadData];
+		}
+		lastLoaded = loadedEntries;
+}
 - (IBAction)openTrace: (id)sender
 {
 	NSString *file = openFile(@"Open Stream Trace");
@@ -537,7 +528,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	{
 		std::string fileName([file UTF8String]);
 		NSError *error = nil;
-		streamTrace = streamtrace::trace::open(fileName);
+		id mainThreadSelf = [self inMainThread];
+		auto callback = [self,mainThreadSelf](streamtrace::trace *t, uint64_t count, bool finished) {
+			if (streamTrace.get() != t)
+			{
+				return true;
+			}
+			[mainThreadSelf loadedEntries: count done: finished];
+			return false;
+		};
+		streamTrace = streamtrace::trace::open(fileName, callback);
 		if (!streamTrace)
 		{
 			// FIXME: Sensible error
