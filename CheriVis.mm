@@ -544,9 +544,10 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			[NSApp presentError: nil];
 			return;
 		}
-		std::thread([self](){
-			auto traceRefCopy = streamTrace;
-			auto kernel = streamTrace->filter([](const streamtrace::debug_trace_entry &e) { return e.is_kernel(); });
+		auto traceRefCopy = streamTrace;
+		std::thread([self,traceRefCopy](){
+			auto kernfilter = [](const streamtrace::debug_trace_entry &e) { return e.is_kernel(); };
+			auto kernel = traceRefCopy->filter(kernfilter);
 			auto user = kernel->inverted_view();
 			[[self inMainThread] loadedKernel: kernel
 										 user: user
