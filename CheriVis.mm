@@ -239,6 +239,14 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	 * The location of the stream trace.  Used to look for files.
 	 */
 	NSString *traceDirectory;
+	/**
+	 * The name of the file containing the notes.
+	 */
+	NSString *notesFile;
+	/**
+	 * Notes associated with the streamtrace.
+	 */
+	NSMutableDictionary *notes;
 }
 - (void)awakeFromNib
 {
@@ -521,9 +529,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	if (file != nil)
 	{
 		std::string fileName([file UTF8String]);
-		NSString *notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
 		NSError *error = nil;
-		// FIXME: load notes
 		streamTrace = streamtrace::trace::open(fileName);
 		if (!streamTrace)
 		{
@@ -539,6 +545,19 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 										 user: user
 									 forTrace: traceRefCopy];
 		}).detach();
+		notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
+		NSData *notesBinary = [NSData dataWithContentsOfFile: notesFile];
+		if (notesBinary != nil)
+		{
+			notes =
+				[NSJSONSerialization JSONObjectWithData: [NSData dataWithContentsOfFile: notesFile]
+										options: NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+										  error: &error];
+		}
+		if (notes == nil)
+		{
+			notes = [NSMutableDictionary new];
+		}
 		[traceView reloadData];
 		NSMutableArray *names = [NSMutableArray new];
 		for (const char *name : cheri::disassembler::MipsRegisterNames)
@@ -634,10 +653,9 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		{
 			return [NSString stringWithFormat: @"%" PRId64, trace->instruction_number_for_index(rowIndex)];
 		}
-		// FIXME: load notes, owned by this object.
-		NSString *notes = nil;//[streamTrace notes];
+		NSString *note = [notes objectForKey: [NSString stringWithFormat: @"%" PRIu64, trace->instruction_number_for_index(rowIndex)]];
 		// Work around a GNUstep bug where nil in a table view is not editable.
-		return notes ? notes : @" ";
+		return note ? note : @" ";
 	}
 
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
@@ -671,17 +689,19 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	{
 		return;
 	}
-	// FIXME: Make notes work again
-#if 0
-	[streamTrace setStateToIndex: rowIndex];
+	auto &trace = [self currentTrace];
+	uint64_t idx = trace->instruction_number_for_index(rowIndex);
+	[notes setObject: [anObject description] forKey: [NSString stringWithFormat: @"%" PRIu64, idx]];
 	NSError *error = nil;
-	[streamTrace setNotes: [anObject description] error: &error];
+	NSData *json = [NSJSONSerialization dataWithJSONObject: notes
+												   options: NSJSONWritingPrettyPrinted
+													 error: &error];
 	if (error)
 	{
 		[NSApp presentError: error];
+		return;
 	}
-#endif
-
+	[json writeToFile: notesFile atomically: YES];
 }
 - (std::shared_ptr<objectfile::function>)functionForPC: (uint64_t*)aPc isRelocated: (BOOL*)outBool rangeStart: (uint64_t*)rs
 {
