@@ -643,7 +643,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			{
 				[field appendAttributedString: stringWithColor([NSString stringWithFormat:@" [ Exception 0x%x ]", ex], [NSColor redColor])];
 			}
-			NSUInteger deadCycles = entry.cycles;
+			NSUInteger deadCycles = entry.dead_cycles;
 			if (deadCycles > 0)
 			{
 				NSString *str = [NSString stringWithFormat: @" ; %lld dead cycles", (long long)deadCycles];
