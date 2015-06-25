@@ -359,7 +359,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		start += increment;
 	}
 	uint64_t end = streamTrace->size();
-	if (start >= end)
+	if ((uint64_t)start >= end)
 	{
 		start = 0;
 	}
