@@ -248,6 +248,14 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	 * Notes associated with the streamtrace.
 	 */
 	NSMutableDictionary *notes;
+	/**
+	 * Counter used to lazily invalidate searches.
+	 */
+	std::atomic<unsigned long long> searchCount;
+	/**
+	 * Thread used for running searches in the background.
+	 */
+	std::thread searchThread;
 }
 - (void)awakeFromNib
 {
@@ -338,6 +346,11 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 }
 - (void)searchWithIncrement: (NSInteger)increment
 {
+	auto trace = [self currentTrace];
+	if (trace == nullptr)
+	{
+		return;
+	}
 	NSInteger start = [traceView selectedRow];
 	// If no row is selected, start from 0
 	if (start == -1)
@@ -348,7 +361,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	{
 		start += increment;
 	}
-	uint64_t end = streamTrace->size();
+	uint64_t end = trace->size();
 	if ((uint64_t)start >= end)
 	{
 		start = 0;
@@ -366,118 +379,150 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	BOOL isRegex = [regexSearch state] == NSOnState;
 
 	NSString *search = [searchText stringValue];
-	NSInteger foundReg = NSNotFound;
-	std::function<bool(const std::string &)> match;
-	// If the string is supposed to be a regular expression, parse it and
-	// report an error.  The matchStringOrRegex() function will use this for
-	// matching if required.
-	if (isRegex)
-	{
-		std::regex r([search UTF8String]);
-		match = [r](const std::string &text) {
-			return std::regex_search(text, r);
-		};
-	}
-	else
-	{
-		std::string s([search UTF8String]);
-		match = [s](const std::string &text) {
-			return text.find(s) != std::string::npos;
-		};
-	}
-	auto trace = [self currentTrace];
 	locale_t cloc = newlocale(LC_ALL_MASK, NULL, NULL);
-	disassembler::disassembler dis;
 
-	bool found = false;
-	NSInteger i;
-	auto filter = [&](const debug_trace_entry &e, const register_set &rs, uint64_t idx) {
-		const size_t buffer_size = 2 /* 0x */ + 16 /* 64 bits */ + 1 /* null terminator */;
-		char buffer[buffer_size];
-		if (idxs)
+	searchCount++;
+	unsigned long long searchCountCopy = searchCount;
+	[self setMessage: @"[Searching...]" forKey: @"Search"];
+	if (searchThread.joinable())
+	{
+		searchThread.join();
+	}
+
+	searchThread = std::thread([=](){
+		NSInteger i;
+		NSInteger foundReg = NSNotFound;
+		bool found = false;
+		disassembler::disassembler dis;
+
+		std::function<bool(const std::string &)> match;
+		// If the string is supposed to be a regular expression, parse it and
+		// report an error.  The matchStringOrRegex() function will use this for
+		// matching if required.
+		if (isRegex)
 		{
-			snprintf_l(buffer, buffer_size, cloc, "%" PRIu64, idx);
-			std::string s(buffer);
-			found  = match(s);
+			std::regex r([search UTF8String]);
+			match = [r](const std::string &text) {
+				return std::regex_search(text, r);
+			};
 		}
-		if (!found && addrs)
+		else
 		{
-			snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, e.pc);
-			std::string s(buffer);
-			found  = match(s);
+			std::string s([search UTF8String]);
+			match = [s](const std::string &text) {
+				return text.find(s) != std::string::npos;
+			};
 		}
-		if (!found && instrs)
-		{
-			snprintf_l(buffer, buffer_size, cloc,"0x%.8" PRIx32, e.inst);
-			std::string s(buffer);
-			found  = match(s);
-		}
-		if (!found && disasm)
-		{
-			auto instr = dis.disassemble(e.inst);
-			std::string s(std::move(instr.name));
-			if (e.exception != 31)
+
+		auto filter = [&](const debug_trace_entry &e, const register_set &rs, uint64_t idx) {
+			const size_t buffer_size = 2 /* 0x */ + 16 /* 64 bits */ + 1 /* null terminator */;
+			char buffer[buffer_size];
+			if (idxs)
 			{
-				snprintf_l(buffer, buffer_size, cloc, "%x", e.exception);
-				s += " [ Exception 0x";
-				s += buffer;
-				s += " ]";
-			}
-			NSUInteger deadCycles = e.dead_cycles;
-			if (deadCycles > 0)
-			{
-				snprintf(buffer, buffer_size, "%lld", (long long)deadCycles);
-				s += " ; ";
-				s += buffer;
-				s += " dead cycles";
-			}
-			found  = match(s);
-		}
-		if (!found && regs)
-		{
-			NSInteger regIdx=0;
-			for (uint64_t gpr : rs.gpr)
-			{
-				regIdx++;
-				snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, gpr);
+				snprintf_l(buffer, buffer_size, cloc, "%" PRIu64, idx);
 				std::string s(buffer);
-				found = match(s);
-				if (found)
+				found  = match(s);
+			}
+			if (!found && addrs)
+			{
+				snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, e.pc);
+				std::string s(buffer);
+				found  = match(s);
+			}
+			if (!found && instrs)
+			{
+				snprintf_l(buffer, buffer_size, cloc,"0x%.8" PRIx32, e.inst);
+				std::string s(buffer);
+				found  = match(s);
+			}
+			if (!found && disasm)
+			{
+				auto instr = dis.disassemble(e.inst);
+				std::string s(std::move(instr.name));
+				if (e.exception != 31)
 				{
-					foundReg = regIdx;
-					break;
+					snprintf_l(buffer, buffer_size, cloc, "%x", e.exception);
+					s += " [ Exception 0x";
+					s += buffer;
+					s += " ]";
+				}
+				NSUInteger deadCycles = e.dead_cycles;
+				if (deadCycles > 0)
+				{
+					snprintf(buffer, buffer_size, "%lld", (long long)deadCycles);
+					s += " ; ";
+					s += buffer;
+					s += " dead cycles";
+				}
+				found  = match(s);
+			}
+			if (!found && regs)
+			{
+				NSInteger regIdx=0;
+				for (uint64_t gpr : rs.gpr)
+				{
+					regIdx++;
+					snprintf_l(buffer, buffer_size, cloc,"0x%.16" PRIx64, gpr);
+					std::string s(buffer);
+					found = match(s);
+					if (found)
+					{
+						foundReg = regIdx;
+						break;
+					}
 				}
 			}
-		}
-		if (!found)
+			if (!found)
+			{
+				i+=increment;
+			}
+			// If another search has started then abort this one.
+			return found || (searchCount != searchCountCopy);
+		};
+		if (increment < 0)
 		{
-			i+=increment;
+			i = start;
+			trace->scan(filter, 0, start, streamtrace::trace::backwards);
+			if (!found)
+			{
+				i = end;
+				trace->scan(filter, start, end, streamtrace::trace::backwards);
+			}
 		}
-		return found;
-	};
-	if (increment < 0)
+		else
+		{
+			i = start;
+			trace->scan(filter, start, end);
+			if (!found)
+			{
+				i = 0;
+				trace->scan(filter, 0, start);
+			}
+		}
+		freelocale(cloc);
+		[[self inMainThread] searchResult: found
+							   traceIndex: i
+									  reg: foundReg
+							  searchCount: searchCountCopy];
+	});
+}
+/**
+ * Method that handles search results.  This is called in the main thread when
+ * the searching thread finds a result.
+ */
+- (void)searchResult: (BOOL)found
+		  traceIndex: (NSInteger)i
+				 reg: (NSInteger)foundReg
+		 searchCount: (unsigned long long)aSearchCount
+{
+	// If this is a stale result, give up.
+	if (searchCount != aSearchCount)
 	{
-		i = start;
-		trace->scan(filter, 0, start, streamtrace::trace::backwards);
-		if (!found)
-		{
-			i = end;
-			trace->scan(filter, start, end, streamtrace::trace::backwards);
-		}
+		return;
 	}
-	else
-	{
-		i = start;
-		trace->scan(filter, start, end);
-		if (!found)
-		{
-			i = 0;
-			trace->scan(filter, 0, start);
-		}
-	}
-	freelocale(cloc);
 	if (found)
 	{
+		[self setMessage: nil forKey: @"Search"];
 		[traceView scrollRowToVisible: i];
 		[traceView selectRow: i byExtendingSelection: NO];
 		if (foundReg != NSNotFound)
@@ -488,7 +533,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	}
 	else
 	{
+		[self setMessage: @"[Search term not found]" forKey: @"Search"];
 		NSBeep();
+	}
+}
+- (void)dealloc
+{
+	searchCount++;
+	if (searchThread.joinable())
+	{
+		searchThread.join();
 	}
 }
 - (IBAction)search: (id)sender
