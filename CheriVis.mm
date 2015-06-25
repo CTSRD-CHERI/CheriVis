@@ -626,6 +626,10 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			}
 			return field;
 		}
+		if ([@"cycles" isEqualToString: columnId])
+		{
+			return [NSString stringWithFormat: @"%" PRId64, entry.cycles];
+		}
 		if ([@"index" isEqualToString: columnId])
 		{
 			return [NSString stringWithFormat: @"%" PRId64, trace->instruction_number_for_index(rowIndex)];
