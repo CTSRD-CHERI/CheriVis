@@ -19,6 +19,8 @@
 		28E5373D18862022006FE3AE /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373B18862022006FE3AE /* MainMenu.xib */; };
 		28E5373F18862022006FE3AE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28E5373E18862022006FE3AE /* Images.xcassets */; };
 		28E5374718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
+		28F387831B3D3AA200FFF3CD /* libcheritrace.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 28F387821B3D3AA200FFF3CD /* libcheritrace.dylib */; };
+		28F387841B3D3AB200FFF3CD /* libcheritrace.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 28F387821B3D3AA200FFF3CD /* libcheritrace.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +69,7 @@
 		28E5373C18862022006FE3AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		28E5373E18862022006FE3AE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		28E5374418862022006FE3AE /* CheriVisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CheriVisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		28F387821B3D3AA200FFF3CD /* libcheritrace.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcheritrace.dylib; path = cheritrace/Build/libcheritrace.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28F387841B3D3AB200FFF3CD /* libcheritrace.dylib in Frameworks */,
 				28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,6 +113,7 @@
 		28E5371A18862022006FE3AE = {
 			isa = PBXGroup;
 			children = (
+				28F387821B3D3AA200FFF3CD /* libcheritrace.dylib */,
 				28E5372C18862022006FE3AE /* CheriVis */,
 				28D774F91A0B79D50035F189 /* traceanalyse */,
 				28E5372518862022006FE3AE /* Frameworks */,
@@ -200,6 +205,7 @@
 				28E5371F18862022006FE3AE /* Sources */,
 				28E5372018862022006FE3AE /* Frameworks */,
 				28E5372118862022006FE3AE /* Resources */,
+				28F387851B3D3F0C00FFF3CD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -271,6 +277,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28F387831B3D3AA200FFF3CD /* libcheritrace.dylib in Resources */,
 				28E5373118862022006FE3AE /* InfoPlist.strings in Resources */,
 				28E5373F18862022006FE3AE /* Images.xcassets in Resources */,
 				28E5373718862022006FE3AE /* Credits.rtf in Resources */,
@@ -286,6 +293,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		28F387851B3D3F0C00FFF3CD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change libcheritrace.dylib @rpath/libcheritrace.dylib $TARGET_BUILD_DIR/CheriVis.app/Contents/MacOS/CheriVis";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		28D774F41A0B79D50035F189 /* Sources */ = {
@@ -609,6 +632,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Resources";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/cheritrace/Build",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = (
 					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
@@ -656,35 +684,8 @@
 					"-D__STDC_LIMIT_MACROS",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/theraven/Documents/Research/cheri/llvm/Build/lib",
-					"-lcurses",
-					"-lpthread",
-					"-lz",
-					"-lLLVMDebugInfo",
-					"-lLLVMObject",
-					"-lLLVMBitReader",
-					"-lLLVMMipsDisassembler",
-					"-lLLVMMCDisassembler",
-					"-lLLVMMipsAsmParser",
-					"-lLLVMMipsCodeGen",
-					"-lLLVMSelectionDAG",
-					"-lLLVMAsmPrinter",
-					"-lLLVMMCParser",
-					"-lLLVMCodeGen",
-					"-lLLVMScalarOpts",
-					"-lLLVMInstCombine",
-					"-lLLVMTransformUtils",
-					"-lLLVMipa",
-					"-lLLVMAnalysis",
-					"-lLLVMTarget",
-					"-lLLVMCore",
-					"-lLLVMMipsDesc",
-					"-lLLVMMipsInfo",
-					"-lLLVMMipsAsmPrinter",
-					"-lLLVMMC",
-					"-lLLVMSupport",
-					"-Lcheritrace/Build",
-					"-lcheritrace",
+					"-rpath",
+					"@executable_path/../Resources",
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -700,6 +701,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "CheriVis/CheriVis-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Resources";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/cheritrace/Build",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = (
 					"-I/Users/theraven/Documents/Research/cheri/llvm/include",
@@ -747,35 +753,8 @@
 					"-D__STDC_LIMIT_MACROS",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/theraven/Documents/Research/cheri/llvm/Release/lib",
-					"-lcurses",
-					"-lpthread",
-					"-lz",
-					"-lLLVMDebugInfo",
-					"-lLLVMObject",
-					"-lLLVMBitReader",
-					"-lLLVMMipsDisassembler",
-					"-lLLVMMCDisassembler",
-					"-lLLVMMipsAsmParser",
-					"-lLLVMMipsCodeGen",
-					"-lLLVMSelectionDAG",
-					"-lLLVMAsmPrinter",
-					"-lLLVMMCParser",
-					"-lLLVMCodeGen",
-					"-lLLVMScalarOpts",
-					"-lLLVMInstCombine",
-					"-lLLVMTransformUtils",
-					"-lLLVMipa",
-					"-lLLVMAnalysis",
-					"-lLLVMTarget",
-					"-lLLVMCore",
-					"-lLLVMMipsDesc",
-					"-lLLVMMipsInfo",
-					"-lLLVMMipsAsmPrinter",
-					"-lLLVMMC",
-					"-lLLVMSupport",
-					"-Lcheritrace/Build",
-					"-lcheritrace",
+					"-rpath",
+					"@executable_path/../Resources",
 				);
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
