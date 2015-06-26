@@ -1,0 +1,3 @@
+[submodule "cheritrace"]
+	path = cheritrace
+	url = https://github.com/CTSRD-CHERI/cheritrace.git
