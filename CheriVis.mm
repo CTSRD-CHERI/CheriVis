@@ -5,6 +5,7 @@
 #include "cheritrace/addressmap.hh"
 #include "cheritrace/objectfile.hh"
 #import <Cocoa/Cocoa.h>
+#include <inttypes.h>
 #include <unordered_map>
 #include <regex>
 #include <thread>

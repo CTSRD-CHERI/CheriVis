@@ -1,6 +1,7 @@
 #import "CVDisassemblyController.h"
 #include "cheritrace/disassembler.hh"
 #import "CVColors.h"
+#import <inttypes.h>
 #import <Cocoa/Cocoa.h>
 
 using namespace cheri::disassembler;
