@@ -6,23 +6,30 @@ Tool for exploring CHERI and BERI streamtraces.
 Building
 --------
 
+When you clone this repository, make sure that you pass the
+`--recurse-submodules` flag to `git`.  This will ensure that you have the copy
+of the cheritrace library that CheriVis is tested with as a submodule.
+
 On any normal UNIX-like platform, CheriVis builds with GNUstep Make.  If you
 have the core GNUstep libraries installed, then you should just be able to run
 [g]make to build.
 
-LLVM is a dependency.  If you build with a stock LLVM, then you will only get
-BERI (MIPS) support.  To build with CHERI/LLVM, define the `LLVM_CONFIG` macro
-on the command line to point to the `llvm-config` from your CHERI/LLVM build.
+You will need to have the cheritrace library installed before you build.
 
-On OS X, there is an XCode project.  Unfortunately, this does not run
-llvm-config, and you must manually add the relevant output to the LDFLAGS and
-CXXFLAGS.  LDFLAGS requires the output from:
+### Building on Mac OS X
 
-	llvm-config --ldflags
-	llvm-config --libs all-targets DebugInfo mc mcparser mcdisassembler object
+On OS X, there is an XCode project.  This does *not* build the cheritrace
+library, so you must build that with CMake first.  The following sequence of
+steps should work:
 
-CXXFLAGS requires the output from:
+	$ git clone --recurse-submodules https://github.com/CTSRD-CHERI/CheriVis.git
+	$ cd CheriVis/cheritrace/
+	$ mkdir Build
+	$ cd Build
+	$ cmake .. -DLLVM_CONFIG=path/to/CHERI-LLVM/llvm-config
+	$ make
+	$ cd ../..
+	$ xcodebuild
 
-	llvm-config --cxxflags
-
-Patches to automate this welcome!
+You should now have a working `build/Release/CheriVis.app`.  For more complex
+build configurations or to edit the code, open the XCode project.
