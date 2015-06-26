@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <regex>
 #include <thread>
+#include <atomic>
 
 using std::shared_ptr;
 using namespace cheri;
@@ -21,6 +22,9 @@ using cheri::streamtrace::register_set;
 NSString *CVCallGraphSelectionChangedNotification = @"_CVCallGraphSelectionChangedNotification";
 NSString *kCVCallGraphSelectedAddressRange = @"kCVCallGraphSelectedAddressRange";
 
+#ifdef  __linux__
+#define snprintf_l(str, size, loc, fmt, ...) snprintf(str, size, fmt, __VA_ARGS__)
+#endif
 
 /**
  * Convenience function that writes the contents of a table view to a pasteboard in RTF format.
