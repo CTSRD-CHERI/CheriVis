@@ -34,6 +34,10 @@ CheriVis_OBJC_FILES = \
 COMPILE_FLAGS= -g -fobjc-arc -O0
 ADDITIONAL_OBJCFLAGS  = -std=c11  ${COMPILE_FLAGS}
 ADDITIONAL_OBJCCFLAGS = -std=gnu++11 -Wno-variadic-macros -Wno-gnu ${COMPILE_FLAGS} -fno-rtti
-ADDITIONAL_LDFLAGS = -lcheritrace
+ADDITIONAL_LDFLAGS = -Lcheritrace/Build -lcheritrace -Wl,-rpath,'$$ORIGIN/Resources',-z,origin
 
 include $(GNUSTEP_MAKEFILES)/application.make
+
+after-all:: cheritrace/Build/libcheritrace.so
+	@echo " Copying libcheritrace.so into .app bundle"
+	@cp cheritrace/Build/libcheritrace.so CheriVis.app/Resources

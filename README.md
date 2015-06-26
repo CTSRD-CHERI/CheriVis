@@ -14,12 +14,9 @@ On any normal UNIX-like platform, CheriVis builds with GNUstep Make.  If you
 have the core GNUstep libraries installed, then you should just be able to run
 [g]make to build.
 
-You will need to have the cheritrace library installed before you build.
-If you do not wish to install the cheritrace library, then you can use it in
-place by building and running with these commands:
-
-	$ [g]make LDFLAGS=-Lcheritrace/Build
-	$ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:cheritrace/Build/ opapp ./CheriVis.app
+You will need to have built the cheritrace library installed before you build,
+in a `Build` subdirectory of the `cheritrace` directory.  The resulting .so
+file will be included in the `CheriVis.app` bundle.
 
 ### Building on Mac OS X
 
