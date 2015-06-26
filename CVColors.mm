@@ -1,4 +1,5 @@
 #import "CVColors.h"
+#import <AppKit/AppKit.h>
 
 static NSColor *greenColor;
 static NSColor *redColor;
