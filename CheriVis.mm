@@ -790,7 +790,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		{
 			objectFile = objectfile::file::open(std::string([path UTF8String]));
 		}
-		if (objectFile == nil)
+		if (objectFile == nullptr)
 		{
 			path = [traceDirectory stringByAppendingPathComponent: fileName];
 			if ([fm fileExistsAtPath: path])
@@ -798,20 +798,20 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 				objectFile = objectfile::file::open(std::string([path UTF8String]));
 			}
 		}
-		if (objectFile == nil)
+		if (objectFile == nullptr)
 		{
 			path = openFile([NSString stringWithFormat: @"Open object file: %@", fileName]);
 			if (path != nil)
 			{
 				objectFile = objectfile::file::open(std::string([path UTF8String]));
-				if (objectFile == nil)
+				if (objectFile == nullptr)
 				{
 					[[NSAlert alertWithMessageText: @"Unable to open object file"
 					                 defaultButton: nil
 					               alternateButton: nil
 					                   otherButton: nil
 					     informativeTextWithFormat: @""] runModal];
-					return nil;
+					return nullptr;
 				}
 			}
 		}
@@ -843,7 +843,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		auto trace = [self currentTrace];
 		trace->seek_to(selectedRow);
 		registers = std::move(trace->get_regs());
-		if (addressMap == nil)
+		if (addressMap == nullptr)
 		{
 			return;
 		}
