@@ -572,13 +572,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 }
 - (void)loadedEntries: (uint64_t)loadedEntries done: (BOOL)isFinished
 {
+	// 50000 is a compromise to avoid overwhelming the table view with
+	// redraw events, but still allowing the user to quickly get to the
+	// end of the trace quickly.
+	if (isFinished || (lastLoaded < 1000) || (loadedEntries - lastLoaded > 500000))
+	{
 		[self setMessage: [NSString stringWithFormat: @"Loaded %" PRIu64 " entries", loadedEntries]
 				  forKey: @"loadedCount"];
-		if ((loadedEntries - lastLoaded > 100000) || isFinished)
-		{
-			[traceView reloadData];
-		}
 		lastLoaded = loadedEntries;
+		[traceView reloadData];
+	}
 }
 - (IBAction)openTrace: (id)sender
 {
@@ -664,7 +667,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 {
 	if (aTableView == traceView)
 	{
-		return (streamTrace == nullptr) ? 0 : [self currentTrace]->size();
+		return lastLoaded;
 	}
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
 	return (streamTrace == nullptr) ? 0 : 32;
