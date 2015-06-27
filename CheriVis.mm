@@ -682,6 +682,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	if (aTableView == traceView)
 	{
 		auto trace = [self currentTrace];
+		assert((uint64_t)rowIndex < trace->size());
 		trace->seek_to(rowIndex);
 		auto entry = trace->get_entry();
 		if ([@"pc" isEqualToString: columnId])
