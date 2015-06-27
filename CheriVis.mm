@@ -577,7 +577,9 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	// end of the trace quickly.
 	if (isFinished || (lastLoaded < 1000) || (loadedEntries - lastLoaded > 500000))
 	{
-		[self setMessage: [NSString stringWithFormat: @"Loaded %" PRIu64 " entries", loadedEntries]
+		[self setMessage: [NSString stringWithFormat: @"Loaded %s%" PRIu64 " entries",
+								isFinished ? "all " : "",
+								loadedEntries]
 				  forKey: @"loadedCount"];
 		lastLoaded = loadedEntries;
 		[traceView reloadData];
