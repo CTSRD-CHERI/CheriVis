@@ -848,11 +848,15 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 {
 	if ([aNotification object] == traceView)
 	{
-		[regsView reloadData];
-		NSUInteger selectedRow = [traceView selectedRow];
+		NSInteger selectedRow = [traceView selectedRow];
+		if (selectedRow == -1)
+		{
+			return;
+		}
 		auto trace = [self currentTrace];
 		trace->seek_to(selectedRow);
 		registers = std::move(trace->get_regs());
+		[regsView reloadData];
 		if (addressMap == nullptr)
 		{
 			return;
