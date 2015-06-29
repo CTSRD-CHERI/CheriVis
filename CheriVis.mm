@@ -636,6 +636,10 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		{
 			[names addObject: [NSString stringWithUTF8String: name]];
 		}
+		for (unsigned int i=0 ; i<32 ; i++)
+		{
+			[names addObject: [NSString stringWithFormat: @"c%d", i]];
+		}
 		// Get an immutable version of the array
 		integerRegisterNames = [names copy];
 		traceDirectory = [file stringByDeletingLastPathComponent];
@@ -672,7 +676,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		return lastLoaded;
 	}
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
-	return (streamTrace == nullptr) ? 0 : 32;
+	return (streamTrace == nullptr) ? 0 : 64;
 }
 -             (id)tableView: (NSTableView*)aTableView
   objectValueForTableColumn: (NSTableColumn*)aTableColumn
@@ -743,13 +747,36 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		{
 			return @"0";
 		}
-		NSAssert(gpridx >= 0 && gpridx<31, @"GPR index out of range");
-		if (!registers.valid_gprs[gpridx])
+		NSAssert(gpridx >= 0, @"GPR index out of range");
+		if (gpridx < 31)
+		{
+			NSAssert(gpridx >= 0 && gpridx<31, @"GPR index out of range");
+			if (!registers.valid_gprs[gpridx])
+			{
+				return stringWithColor(@"???", [NSColor redColor]);
+			}
+			uint64_t value = registers.gpr[gpridx];
+			return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64, value], [NSColor blackColor]);
+		}
+		gpridx -= 31;
+		NSAssert(gpridx >= 0 && gpridx<32, @"GPR index out of range");
+		if (!registers.valid_caps[gpridx])
 		{
 			return stringWithColor(@"???", [NSColor redColor]);
 		}
-		uint64_t value = registers.gpr[gpridx];
-		return stringWithColor([NSString stringWithFormat: @"0x%.16" PRIx64, value], [NSColor blackColor]);
+		auto &cap = registers.cap_reg[gpridx];
+		return stringWithColor([NSString stringWithFormat: @"t:%1d u:%1d perms:0x%8.8" PRIx16
+								" type:0x%6.6" PRIx32
+								" offset:0x%16.16" PRIx64
+								" base:0x%16.16" PRIx64
+								" length:0x%16.16" PRIx64,
+								(int)cap.valid,
+								(int)cap.unsealed,
+								cap.permissions,
+								cap.type,
+								cap.offset,
+								cap.base,
+								cap.length], [NSColor blackColor]);
 	}
 	return nil;
 }
