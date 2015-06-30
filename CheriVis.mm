@@ -384,7 +384,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	BOOL isRegex = [regexSearch state] == NSOnState;
 
 	NSString *search = [searchText stringValue];
-	locale_t cloc = newlocale(LC_ALL_MASK, NULL, NULL);
 
 	searchCount++;
 	unsigned long long searchCountCopy = searchCount;
@@ -395,6 +394,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	}
 
 	searchThread = std::thread([=](){
+		locale_t cloc = newlocale(LC_ALL_MASK, "C", NULL);
 		NSInteger i;
 		NSInteger foundReg = NSNotFound;
 		bool found = false;
@@ -504,7 +504,10 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 				trace->scan(filter, 0, start);
 			}
 		}
-		freelocale(cloc);
+		if (cloc != nullptr)
+		{
+			freelocale(cloc);
+		}
 		[[self inMainThread] searchResult: found
 							   traceIndex: i
 									  reg: foundReg
