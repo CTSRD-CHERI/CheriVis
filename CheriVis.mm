@@ -708,7 +708,8 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			disassembler::disassembler dis;
 			auto info = dis.disassemble(entry.inst);
 			NSColor *textColor = [CVColors colorForInstructionType: info.type];
-			NSString *instr = [NSString stringWithUTF8String: info.name.c_str()];
+			NSString *instr = [[NSString stringWithUTF8String: info.name.c_str()]
+									stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
 			NSMutableAttributedString *field = [stringWithColor(instr, textColor) mutableCopy];
 			uint8_t ex = entry.exception;
 			if (ex != 31)
