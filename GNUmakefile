@@ -11,6 +11,7 @@ APP_NAME = CheriVis
 #
 CheriVis_LANGUAGES = English
 CheriVis_RESOURCE_FILES = \
+	cheritrace/Build/libcheritrace.so\
 	CheriVis/Base.lproj/MainMenu.xib \
 	CheriVis.tiff
 CheriVis_APPLICATION_ICON = CheriVis.tiff
@@ -37,7 +38,3 @@ ADDITIONAL_OBJCCFLAGS = -std=gnu++11 -Wno-variadic-macros -Wno-gnu ${COMPILE_FLA
 ADDITIONAL_LDFLAGS = -Lcheritrace/Build -lcheritrace -Wl,-rpath,'$$ORIGIN/Resources',-z,origin
 
 include $(GNUSTEP_MAKEFILES)/application.make
-
-after-all:: cheritrace/Build/libcheritrace.so
-	@echo " Copying libcheritrace.so into .app bundle"
-	@cp cheritrace/Build/libcheritrace.so CheriVis.app/Resources
