@@ -786,7 +786,7 @@
 						<object class="NSButton" id="192263856">
 							<reference key="NSNextResponder" ref="794975305"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{141, 666}, {82, 23}}</string>
+							<string key="NSFrame">{{141, 660}, {129, 32}}</string>
 							<reference key="NSSuperview" ref="794975305"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="1003827415"/>
@@ -798,24 +798,21 @@
 								<string key="NSContents">Search back</string>
 								<reference key="NSSupport" ref="1026760855"/>
 								<reference key="NSControlView" ref="192263856"/>
-								<int key="NSButtonFlags">-2033565696</int>
-								<int key="NSButtonFlags2">162</int>
-								<object class="NSFont" key="NSAlternateImage" id="575179863">
-									<string key="NSName">LucidaGrande</string>
-									<double key="NSSize">13</double>
-									<int key="NSfFlags">16</int>
-								</object>
+								<int key="NSButtonFlags">-2038284288</int>
+								<int key="NSButtonFlags2">129</int>
+								<reference key="NSAlternateImage" ref="1026760855"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
+								<int key="NSAuxButtonType">7</int>
 							</object>
 							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="1003827415">
 							<reference key="NSNextResponder" ref="794975305"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{231, 666}, {66, 23}}</string>
+							<string key="NSFrame">{{270, 660}, {114, 32}}</string>
 							<reference key="NSSuperview" ref="794975305"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="986853079"/>
@@ -827,20 +824,21 @@
 								<string key="NSContents">Search</string>
 								<reference key="NSSupport" ref="1026760855"/>
 								<reference key="NSControlView" ref="1003827415"/>
-								<int key="NSButtonFlags">-2033565696</int>
-								<int key="NSButtonFlags2">162</int>
-								<reference key="NSAlternateImage" ref="575179863"/>
+								<int key="NSButtonFlags">-2034876416</int>
+								<int key="NSButtonFlags2">1</int>
+								<reference key="NSAlternateImage" ref="1026760855"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
+								<int key="NSAuxButtonType">7</int>
 							</object>
 							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="986853079">
 							<reference key="NSNextResponder" ref="794975305"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{303, 668}, {107, 18}}</string>
+							<string key="NSFrame">{{398, 668}, {107, 18}}</string>
 							<reference key="NSSuperview" ref="794975305"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="241640267"/>
@@ -1065,7 +1063,7 @@
 															<string key="NSFrameSize">{720.5, 193.5}</string>
 															<reference key="NSSuperview" ref="609233750"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="962959736"/>
+															<reference key="NSNextKeyView" ref="1002162570"/>
 															<bool key="NSEnabled">YES</bool>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1366,7 +1364,7 @@
 											<string key="NSFrameSize">{722.5, 211.5}</string>
 											<reference key="NSSuperview" ref="44864252"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1002162570"/>
+											<reference key="NSNextKeyView" ref="609233750"/>
 											<bool key="NSDoNotTranslateAutoresizingMask">YES</bool>
 											<int key="NSsFlags">133682</int>
 											<reference key="NSVScroller" ref="1053953754"/>
@@ -1398,7 +1396,7 @@
 																	<string key="NSFrameSize">{721, 303.5}</string>
 																	<reference key="NSSuperview" ref="893043328"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="98548280"/>
+																	<reference key="NSNextKeyView" ref="8713904"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																	<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1582,7 +1580,7 @@
 													<string key="NSFrameSize">{722.5, 336.5}</string>
 													<reference key="NSSuperview" ref="507277863"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="8713904"/>
+													<reference key="NSNextKeyView" ref="893043328"/>
 													<int key="NSsFlags">133810</int>
 													<reference key="NSVScroller" ref="1067819555"/>
 													<reference key="NSHScroller" ref="98548280"/>
@@ -1671,7 +1669,7 @@
 													<string key="NSFrameSize">{456.5, 581}</string>
 													<reference key="NSSuperview" ref="385048801"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="421686527"/>
+													<reference key="NSNextKeyView" ref="792928454"/>
 													<bool key="NSEnabled">YES</bool>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1828,7 +1826,7 @@
 									<string key="NSFrame">{{732.5, 0}, {458.5, 599}}</string>
 									<reference key="NSSuperview" ref="993766487"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="792928454"/>
+									<reference key="NSNextKeyView" ref="385048801"/>
 									<bool key="NSDoNotTranslateAutoresizingMask">YES</bool>
 									<int key="NSsFlags">133682</int>
 									<reference key="NSVScroller" ref="421686527"/>
@@ -3041,17 +3039,17 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="857122484"/>
 							<reference ref="192263856"/>
-							<reference ref="1003827415"/>
 							<reference ref="241640267"/>
 							<reference ref="285174204"/>
 							<reference ref="993766487"/>
-							<reference ref="986853079"/>
 							<reference ref="1002511790"/>
 							<reference ref="475651128"/>
 							<reference ref="687926072"/>
 							<reference ref="764479735"/>
 							<reference ref="539310344"/>
 							<reference ref="185139712"/>
+							<reference ref="1003827415"/>
+							<reference ref="986853079"/>
 						</array>
 						<reference key="parent" ref="438664335"/>
 					</object>
