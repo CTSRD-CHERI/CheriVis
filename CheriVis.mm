@@ -82,38 +82,6 @@ static NSString *openFile(NSString *title)
 	return nil;
 }
 
-@interface CVMainThreadProxy : NSProxy
-- (id)initWithReceiver: (id)proxied;
-@end
-@implementation CVMainThreadProxy
-{
-	id forward;
-}
-- (id)initWithReceiver: (id)proxied
-{
-	forward = proxied;
-	return self;
-}
-- (NSMethodSignature*)methodSignatureForSelector: (SEL)aSelector
-{
-	return [forward methodSignatureForSelector: aSelector];
-}
-- (void)forwardInvocation: (NSInvocation *)invocation
-{
-	[invocation retainArguments];
-	[invocation performSelectorOnMainThread: @selector(invokeWithTarget:)
-								 withObject: forward
-							  waitUntilDone: NO];
-}
-@end
-
-@implementation NSObject (inMainThread)
-- (id)inMainThread
-{
-	return [[CVMainThreadProxy alloc] initWithReceiver: self];
-}
-@end
-
 /**
  * Helper function that creates an attributed string by applying a single
  * colour and a fixed-width font to a string.
@@ -261,6 +229,17 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	 * Thread used for running searches in the background.
 	 */
 	std::thread searchThread;
+}
+- (void)runBlock: (void(^)(void))aBlock
+{
+	aBlock();
+}
+
+- (void)runBlockInMainThread: (void(^)(void))aBlock
+{
+	[self performSelectorOnMainThread: @selector(runBlock:)
+						   withObject: aBlock
+						waitUntilDone: NO];
 }
 - (void)awakeFromNib
 {
@@ -508,10 +487,12 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		{
 			freelocale(cloc);
 		}
-		[[self inMainThread] searchResult: found
-							   traceIndex: i
-									  reg: foundReg
-							  searchCount: searchCountCopy];
+
+		[self runBlockInMainThread: ^(){
+			[self searchResult: found
+				    traceIndex: i
+					       reg: foundReg
+				   searchCount: searchCountCopy]; }];
 	});
 }
 /**
@@ -597,13 +578,12 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	{
 		std::string fileName([file UTF8String]);
 		NSError *error = nil;
-		id mainThreadSelf = [self inMainThread];
-		auto callback = [self,mainThreadSelf](streamtrace::trace *t, uint64_t count, bool finished) {
+		auto callback = [self](streamtrace::trace *t, uint64_t count, bool finished) {
 			if (streamTrace.get() != t)
 			{
 				return true;
 			}
-			[mainThreadSelf loadedEntries: count done: finished];
+			[self runBlockInMainThread: ^(void){ [self loadedEntries: count done: finished]; }];
 			return false;
 		};
 		streamTrace = streamtrace::trace::open(fileName, callback);
@@ -618,9 +598,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			auto kernfilter = [](const streamtrace::debug_trace_entry &e) { return e.is_kernel(); };
 			auto kernel = traceRefCopy->filter(kernfilter);
 			auto user = kernel->inverted_view();
-			[[self inMainThread] loadedKernel: kernel
-										 user: user
-									 forTrace: traceRefCopy];
+			[self runBlockInMainThread:^(void){ [self loadedKernel: kernel user: user forTrace: traceRefCopy]; }];
 		}).detach();
 		notesFile = [NSString stringWithFormat: @"%@.notes.json", file];
 		NSData *notesBinary = [NSData dataWithContentsOfFile: notesFile];
