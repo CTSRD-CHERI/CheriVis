@@ -678,7 +678,12 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 {
 	if (aTableView == traceView)
 	{
-		return lastLoaded;
+		auto &trace = [self currentTrace];
+		if (trace == streamTrace)
+		{
+			return lastLoaded;
+		}
+		return trace->size();
 	}
 	NSAssert(aTableView == regsView, @"Unexpected table view!");
 	return (streamTrace == nullptr) ? 0 : 64;
