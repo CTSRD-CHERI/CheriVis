@@ -754,7 +754,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			return stringWithColor(@"???", [NSColor redColor]);
 		}
 		auto &cap = registers.cap_reg[gpridx];
-		return stringWithColor([NSString stringWithFormat: @"t:%1d u:%1d perms:0x%8.8" PRIx16
+		return stringWithColor([NSString stringWithFormat: @"v:%1d u:%1d perms:0x%8.8" PRIx16
 								" type:0x%6.6" PRIx32
 								" offset:0x%16.16" PRIx64
 								" base:0x%16.16" PRIx64
