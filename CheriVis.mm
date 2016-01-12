@@ -615,13 +615,15 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		}
 		[traceView reloadData];
 		NSMutableArray *names = [NSMutableArray new];
-		for (const char *name : cheri::disassembler::MipsRegisterNames)
+		for (int i=0 ; i<32 ; i++)
 		{
+			const char *name = cheri::disassembler::MipsRegisterNames[i];
 			[names addObject: [NSString stringWithUTF8String: name]];
 		}
-		for (unsigned int i=0 ; i<32 ; i++)
+		for (int i=64 ; i<96 ; i++)
 		{
-			[names addObject: [NSString stringWithFormat: @"c%d", i]];
+			const char *name = cheri::disassembler::MipsRegisterNames[i];
+			[names addObject: [NSString stringWithUTF8String: name]];
 		}
 		// Get an immutable version of the array
 		integerRegisterNames = [names copy];
