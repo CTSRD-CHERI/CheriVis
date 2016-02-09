@@ -15,7 +15,7 @@ using namespace cheri;
 using cheri::streamtrace::debug_trace_entry;
 using cheri::streamtrace::register_set;
 
-@interface CheriVis : NSObject  <NSTableViewDataSource, NSTableViewDelegate>
+@interface CheriVisDocument : NSDocument  <NSTableViewDataSource, NSTableViewDelegate>
 @end
 
 NSString *CVCallGraphSelectionChangedNotification = @"_CVCallGraphSelectionChangedNotification";
@@ -107,7 +107,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
  * The CheriVis class implements the controller for the CheriVis application.
  * A single instance of it is created in the main nib file for the application.
  */
-@implementation CheriVis
+@implementation CheriVisDocument
 {
 	/**
 	 * The main window of the CheriVis application.
@@ -236,12 +236,13 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 						   withObject: aBlock
 						waitUntilDone: NO];
 }
-- (void)awakeFromNib
+- (id)init
 {
-	// FIXME: These should be done in the .gorm
-	[regsView setDelegate: self];
-	[regsView setDataSource: self];
-
+	self = [super init];
+	if (self == nil)
+	{
+		return self;
+	}
 	messages = [NSMutableDictionary new];
 
 	[[NSNotificationCenter defaultCenter]
@@ -260,6 +261,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		   selector: @selector(selectRange:)
 	           name: CVCallGraphSelectionChangedNotification
 	         object: nil];
+	return self;
 }
 - (void)setMessage: (NSString*)aString forKey: (id)aKey
 {
@@ -523,6 +525,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 }
 - (void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
 	searchCount++;
 	if (searchThread.joinable())
 	{
@@ -566,9 +569,24 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		[traceView reloadData];
 	}
 }
-- (IBAction)openTrace: (id)sender
++ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
 {
-	NSString *file = openFile(@"Open Stream Trace");
+	return YES;
+}
+- (void)makeWindowControllers
+{
+	[self addWindowController: [[NSWindowController alloc] initWithWindowNibName: @"Document" owner: self]];
+	//assert(mainWindow != nil);
+}
+- (BOOL)readFromURL: (NSURL*)absoluteURL
+			 ofType: (NSString*)typeName
+			  error: (NSError**)outError
+{
+	if (![absoluteURL isFileURL])
+	{
+		return NO;
+	}
+	NSString *file = [absoluteURL path];
 	if (file != nil)
 	{
 		std::string fileName([file UTF8String]);
@@ -585,9 +603,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		streamTrace = streamtrace::trace::open(fileName, callback);
 		if (!streamTrace)
 		{
-			// FIXME: Sensible error
-			[NSApp presentError: nil];
-			return;
+			return NO;
 		}
 		auto traceRefCopy = streamTrace;
 		std::thread([self,traceRefCopy](){
@@ -625,6 +641,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		integerRegisterNames = [names copy];
 		traceDirectory = [file stringByDeletingLastPathComponent];
 	}
+	return YES;
 }
 - (IBAction)openProcstat: (id)sender
 {
