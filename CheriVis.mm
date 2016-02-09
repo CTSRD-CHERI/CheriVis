@@ -586,6 +586,7 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 			[self runBlockInMainThread: ^(void){ [self loadedEntries: count done: finished]; }];
 			return false;
 		};
+		[self loadedEntries: 0 done: NO];
 		streamTrace = streamtrace::trace::open(fileName, callback);
 		if (!streamTrace)
 		{
