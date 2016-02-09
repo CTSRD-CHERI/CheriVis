@@ -10,7 +10,7 @@
 		28459D23188620EC00798DAC /* CVColors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D17188620EC00798DAC /* CVColors.mm */; };
 		28459D25188620EC00798DAC /* CVDisassemblyController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28459D1B188620EC00798DAC /* CVDisassemblyController.mm */; };
 		28459D291886225D00798DAC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 28459D281886225D00798DAC /* main.m */; };
-		28AE345D1C6A1081005AAFDF /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AE345C1C6A1081005AAFDF /* Document.xib */; };
+		28AE34621C6A5022005AAFDF /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AE34601C6A5022005AAFDF /* Document.xib */; };
 		28C925871B0C0F50004091DE /* CheriVis.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28C925861B0C0F50004091DE /* CheriVis.mm */; };
 		28E5372718862022006FE3AE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28E5372618862022006FE3AE /* Cocoa.framework */; };
 		28E5373118862022006FE3AE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28E5372F18862022006FE3AE /* InfoPlist.strings */; };
@@ -27,7 +27,7 @@
 		28459D1A188620EC00798DAC /* CVDisassemblyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassemblyController.h; sourceTree = SOURCE_ROOT; };
 		28459D1B188620EC00798DAC /* CVDisassemblyController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVDisassemblyController.mm; sourceTree = SOURCE_ROOT; };
 		28459D281886225D00798DAC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
-		28AE345C1C6A1081005AAFDF /* Document.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Document.xib; sourceTree = "<group>"; };
+		28AE34611C6A5022005AAFDF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = "<group>"; };
 		28C925861B0C0F50004091DE /* CheriVis.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CheriVis.mm; sourceTree = SOURCE_ROOT; };
 		28E5372318862022006FE3AE /* CheriVis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheriVis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		28E5372618862022006FE3AE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -94,6 +94,7 @@
 		28E5372C18862022006FE3AE /* CheriVis */ = {
 			isa = PBXGroup;
 			children = (
+				28AE34601C6A5022005AAFDF /* Document.xib */,
 				28459D281886225D00798DAC /* main.m */,
 				28C925861B0C0F50004091DE /* CheriVis.mm */,
 				28459D16188620EC00798DAC /* CVColors.h */,
@@ -101,7 +102,6 @@
 				28459D1A188620EC00798DAC /* CVDisassemblyController.h */,
 				28459D1B188620EC00798DAC /* CVDisassemblyController.mm */,
 				28E5373B18862022006FE3AE /* MainMenu.xib */,
-				28AE345C1C6A1081005AAFDF /* Document.xib */,
 				28E5373E18862022006FE3AE /* Images.xcassets */,
 				28E5372D18862022006FE3AE /* Supporting Files */,
 			);
@@ -173,7 +173,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28AE345D1C6A1081005AAFDF /* Document.xib in Resources */,
+				28AE34621C6A5022005AAFDF /* Document.xib in Resources */,
 				28F387831B3D3AA200FFF3CD /* libcheritrace.dylib in Resources */,
 				28E5373118862022006FE3AE /* InfoPlist.strings in Resources */,
 				28E5373F18862022006FE3AE /* Images.xcassets in Resources */,
@@ -215,6 +215,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		28AE34601C6A5022005AAFDF /* Document.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28AE34611C6A5022005AAFDF /* Base */,
+			);
+			name = Document.xib;
+			sourceTree = "<group>";
+		};
 		28E5372F18862022006FE3AE /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
