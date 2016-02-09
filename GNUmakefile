@@ -3,7 +3,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #
 # Application information
 #
-VERSION = 0.1
+VERSION = 0.5
 APP_NAME = CheriVis
 
 #
@@ -13,7 +13,9 @@ CheriVis_LANGUAGES = English
 CheriVis_RESOURCE_FILES = \
 	cheritrace/Build/libcheritrace.so\
 	CheriVis/Base.lproj/MainMenu.xib \
+	CheriVis/Base.lproj/Document.xib \
 	CheriVis.tiff
+
 CheriVis_APPLICATION_ICON = CheriVis.tiff
 CheriVis_MAIN_MODEL_FILE = MainMenu.xib
 

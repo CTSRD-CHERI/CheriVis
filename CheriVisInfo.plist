@@ -1,0 +1,12 @@
+{
+  NSTypes = (
+      {
+              NSDocumentClass = "CheriVisDocument";
+              NSName = "GSTextDocumentType";
+              NSHumanReadableName = "Trace file";
+              NSUnixExtensions = ( "trace", "xz", "" );
+              NSRole = Editor;
+      }
+  );
+
+}
