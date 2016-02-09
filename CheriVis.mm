@@ -523,6 +523,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 		NSBeep();
 	}
 }
+- (void)close
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+	searchCount++;
+	if (searchThread.joinable())
+	{
+		searchThread.join();
+	}
+	[super close];
+}
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
