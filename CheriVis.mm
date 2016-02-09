@@ -594,8 +594,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	[traceView setDelegate: self];
 	[traceView setDataSource: self];
 #endif
-	//[self addWindowController: [[NSWindowController alloc] initWithWindowNibName: @"Document" owner: self]];
-	//assert(mainWindow != nil);
 }
 - (BOOL)readFromURL: (NSURL*)absoluteURL
 			 ofType: (NSString*)typeName
