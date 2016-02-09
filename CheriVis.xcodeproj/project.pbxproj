@@ -21,8 +21,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		28459D14188620EC00798DAC /* CVCallGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVCallGraph.h; sourceTree = SOURCE_ROOT; };
-		28459D15188620EC00798DAC /* CVCallGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVCallGraph.m; sourceTree = SOURCE_ROOT; };
 		28459D16188620EC00798DAC /* CVColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVColors.h; sourceTree = SOURCE_ROOT; };
 		28459D17188620EC00798DAC /* CVColors.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVColors.mm; sourceTree = SOURCE_ROOT; };
 		28459D1A188620EC00798DAC /* CVDisassemblyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVDisassemblyController.h; sourceTree = SOURCE_ROOT; };
@@ -96,8 +94,6 @@
 			children = (
 				28459D281886225D00798DAC /* main.m */,
 				28C925861B0C0F50004091DE /* CheriVis.mm */,
-				28459D14188620EC00798DAC /* CVCallGraph.h */,
-				28459D15188620EC00798DAC /* CVCallGraph.m */,
 				28459D16188620EC00798DAC /* CVColors.h */,
 				28459D17188620EC00798DAC /* CVColors.mm */,
 				28459D1A188620EC00798DAC /* CVDisassemblyController.h */,

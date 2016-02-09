@@ -1,6 +1,5 @@
 #import "cheritrace/cheritrace.hh"
 #import "CVDisassemblyController.h"
-#import "CVCallGraph.h"
 #import "CVColors.h"
 #include "cheritrace/addressmap.hh"
 #include "cheritrace/objectfile.hh"
@@ -168,10 +167,6 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 	 * The status bar along the bottom of the window.
 	 */
 	IBOutlet __unsafe_unretained NSTextField *statusBar;
-	/**
-	 * The controller for the call graph view.
-	 */
-	IBOutlet __unsafe_unretained CVCallGraph *callGraph;
 	/**
 	 * The currently loaded stream trace.
 	 */
