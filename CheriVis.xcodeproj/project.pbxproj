@@ -29,9 +29,6 @@
 		28459D1B188620EC00798DAC /* CVDisassemblyController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CVDisassemblyController.mm; sourceTree = SOURCE_ROOT; };
 		28459D281886225D00798DAC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		28C925861B0C0F50004091DE /* CheriVis.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CheriVis.mm; sourceTree = SOURCE_ROOT; };
-		28D774FA1A0B79D50035F189 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		28D775021A0B85A90035F189 /* CVTraceAnalyse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVTraceAnalyse.h; sourceTree = "<group>"; };
-		28D775031A0B85A90035F189 /* CVTraceAnalyse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVTraceAnalyse.m; sourceTree = "<group>"; };
 		28E5372318862022006FE3AE /* CheriVis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheriVis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		28E5372618862022006FE3AE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		28E5372918862022006FE3AE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -58,22 +55,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		28D774F91A0B79D50035F189 /* traceanalyse */ = {
-			isa = PBXGroup;
-			children = (
-				28D774FA1A0B79D50035F189 /* main.m */,
-				28D775021A0B85A90035F189 /* CVTraceAnalyse.h */,
-				28D775031A0B85A90035F189 /* CVTraceAnalyse.m */,
-			);
-			path = traceanalyse;
-			sourceTree = "<group>";
-		};
 		28E5371A18862022006FE3AE = {
 			isa = PBXGroup;
 			children = (
 				28F387821B3D3AA200FFF3CD /* libcheritrace.dylib */,
 				28E5372C18862022006FE3AE /* CheriVis */,
-				28D774F91A0B79D50035F189 /* traceanalyse */,
 				28E5372518862022006FE3AE /* Frameworks */,
 				28E5372418862022006FE3AE /* Products */,
 			);
