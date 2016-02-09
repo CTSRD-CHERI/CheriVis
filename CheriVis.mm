@@ -585,7 +585,16 @@ static NSAttributedString* stringWithColor(NSString *str, NSColor *color)
 }
 - (void)makeWindowControllers
 {
-	[self addWindowController: [[NSWindowController alloc] initWithWindowNibName: @"Document" owner: self]];
+	NSWindowController *wc = [[NSWindowController alloc] initWithWindowNibName: @"Document" owner: self];
+	[self addWindowController: wc];
+#ifdef GNUSTEP
+	[wc loadWindow];
+	[regsView setDelegate: self];
+	[regsView setDataSource: self];
+	[traceView setDelegate: self];
+	[traceView setDataSource: self];
+#endif
+	//[self addWindowController: [[NSWindowController alloc] initWithWindowNibName: @"Document" owner: self]];
 	//assert(mainWindow != nil);
 }
 - (BOOL)readFromURL: (NSURL*)absoluteURL
