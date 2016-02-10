@@ -3,7 +3,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #
 # Application information
 #
-VERSION = 0.5
+VERSION = 0.4
 APP_NAME = CheriVis
 
 #
