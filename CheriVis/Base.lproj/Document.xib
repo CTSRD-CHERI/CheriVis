@@ -377,7 +377,7 @@
 															<string key="NSFrameSize">{720.5, 193.5}</string>
 															<reference key="NSSuperview" ref="609233750"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="1002162570"/>
+															<reference key="NSNextKeyView" ref="962959736"/>
 															<bool key="NSEnabled">YES</bool>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -678,7 +678,7 @@
 											<string key="NSFrameSize">{722.5, 211.5}</string>
 											<reference key="NSSuperview" ref="44864252"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="609233750"/>
+											<reference key="NSNextKeyView" ref="1002162570"/>
 											<bool key="NSDoNotTranslateAutoresizingMask">YES</bool>
 											<int key="NSsFlags">133682</int>
 											<reference key="NSVScroller" ref="1053953754"/>
@@ -710,7 +710,7 @@
 																	<string key="NSFrameSize">{721, 303.5}</string>
 																	<reference key="NSSuperview" ref="893043328"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="8713904"/>
+																	<reference key="NSNextKeyView" ref="98548280"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																	<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -894,7 +894,7 @@
 													<string key="NSFrameSize">{722.5, 336.5}</string>
 													<reference key="NSSuperview" ref="507277863"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="893043328"/>
+													<reference key="NSNextKeyView" ref="8713904"/>
 													<int key="NSsFlags">133810</int>
 													<reference key="NSVScroller" ref="1067819555"/>
 													<reference key="NSHScroller" ref="98548280"/>
@@ -983,7 +983,7 @@
 													<string key="NSFrameSize">{456.5, 581}</string>
 													<reference key="NSSuperview" ref="385048801"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="792928454"/>
+													<reference key="NSNextKeyView" ref="421686527"/>
 													<bool key="NSEnabled">YES</bool>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1140,7 +1140,7 @@
 									<string key="NSFrame">{{732.5, 0}, {458.5, 599}}</string>
 									<reference key="NSSuperview" ref="993766487"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="385048801"/>
+									<reference key="NSNextKeyView" ref="792928454"/>
 									<bool key="NSDoNotTranslateAutoresizingMask">YES</bool>
 									<int key="NSsFlags">133682</int>
 									<reference key="NSVScroller" ref="421686527"/>
@@ -1375,6 +1375,38 @@
 						<reference key="destination" ref="584593987"/>
 					</object>
 					<string key="id">vZo-Nc-HhY</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="879184261"/>
+						<reference key="destination" ref="374441053"/>
+					</object>
+					<string key="id">aLc-1u-Q64</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="879184261"/>
+						<reference key="destination" ref="374441053"/>
+					</object>
+					<string key="id">7ST-af-2Cc</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="1062641492"/>
+						<reference key="destination" ref="374441053"/>
+					</object>
+					<string key="id">fPA-Lj-2Fg</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="1062641492"/>
+						<reference key="destination" ref="374441053"/>
+					</object>
+					<string key="id">Y0A-e6-xqh</string>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
